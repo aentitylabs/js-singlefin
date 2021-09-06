@@ -50,18 +50,18 @@ export class Singlefin extends Influencer {
     public informTo(bridge: Bridge, trend: string) {
         this._currentTrend.trend = trend;
 
-        this._entityStore.syncTo(bridge);
+        return this._entityStore.syncTo(bridge).then(() => {
+            this.newTrend(trend, this._model);
 
-        this.newTrend(trend, this._model);
-
-        this._entityStore.syncTo(bridge);
+            return this._entityStore.syncTo(bridge);
+        });
     }
 
     public informFrom(bridge: Bridge, actions: any) {
-        this._entityStore.syncFrom(bridge, actions);
+        this._entityStore.syncFrom(bridge, actions, () => {
+            this.newTrend(this._currentTrend.trend, this._model);
 
-        this.newTrend(this._currentTrend.trend, this._model);
-
-        this._entityStore.sync();
+            this._entityStore.sync();     
+        });
     }
 }

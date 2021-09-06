@@ -5,8 +5,6 @@ import { LoginFormState } from '../src/test/loginformstate';
 import { HomeState } from '../src/test/homestate';
 import { AlertClosedState } from '../src/test/alertclosedstate';
 import { AlertWaitState } from '../src/test/alertwaitstate';
-import { CloudCheckAuthorizationState } from '../src/test/cloudcheckauthorizationstate';
-import { CloudLoginState } from '../src/test/cloudloginstate';
 import { MockSource } from '../src/test/mocksource';
 import { MockBridge } from '../src/test/mockbridge';
 import { Follower } from '../src/influencer/follower';
@@ -549,44 +547,44 @@ describe('Broker', () => {
             }
         };
 
-        singlefinClient.informTo(bridge, "login");
-
-        expect({
-            "followers": {
-                "App": {
-                    "name": "App",
-                    "state": "is showing homepage"
+        singlefinClient.informTo(bridge, "login").then(() => {
+            expect({
+                "followers": {
+                    "App": {
+                        "name": "App",
+                        "state": "is showing homepage"
+                    }
                 }
-            }
-        }).to.eql(singlefinServer.serialize());
-
-        expect({
-            "followers": {
-                "AppAlert": {
-                    "name": "AppAlert",
-                    "state": "is showing wait alert"
+            }).to.eql(singlefinServer.serialize());
+    
+            expect({
+                "followers": {
+                    "AppAlert": {
+                        "name": "AppAlert",
+                        "state": "is showing wait alert"
+                    }
                 }
-            }
-        }).to.eql(singlefinClient.serialize());
-
-        singlefinClient.informTo(bridge, "access to homepage");
-
-        expect({
-            "followers": {
-                "App": {
-                    "name": "App",
-                    "state": "is showing homepage"
-                }
-            }
-        }).to.eql(singlefinServer.serialize());
-
-        expect({
-            "followers": {
-                "AppAlert": {
-                    "name": "AppAlert",
-                    "state": "is closed"
-                }
-            }
-        }).to.eql(singlefinClient.serialize());
+            }).to.eql(singlefinClient.serialize());
+    
+            singlefinClient.informTo(bridge, "access to homepage").then(() => {
+                expect({
+                    "followers": {
+                        "App": {
+                            "name": "App",
+                            "state": "is showing homepage"
+                        }
+                    }
+                }).to.eql(singlefinServer.serialize());
+        
+                expect({
+                    "followers": {
+                        "AppAlert": {
+                            "name": "AppAlert",
+                            "state": "is closed"
+                        }
+                    }
+                }).to.eql(singlefinClient.serialize());
+            });
+        });
     })
 })
