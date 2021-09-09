@@ -1,9 +1,9 @@
 import { Influencer } from "./influencer/influencer";
 import { EntityStore } from "../../js-entity-store/src/entitystore"
-import { Entity } from "../../js-entity-store/src/entity";
 import { EntityFactory } from "../../js-entity-store/src/entityfactory";
 import { Source } from "../../js-entity-store/src/source";
 import { Bridge } from "../../js-entity-store/src/bridge";
+import { SinglefinSource } from "./singlefinsource";
 
 
 export class Singlefin extends Influencer {
@@ -20,9 +20,14 @@ export class Singlefin extends Influencer {
             "properties": {
                 "trend": {
                     "value": ""
+                },
+                "trends": {
+                    "value": {}
                 }
             }
         });
+
+        this._entityStore.addSource("Singlefin", new SinglefinSource());
     }
 
     public setModel(model: any) {
@@ -38,7 +43,10 @@ export class Singlefin extends Influencer {
     }
 
     public inform(trend: string) {
+        const followers = this._trends[trend];
+
         this._currentTrend.trend = trend;
+        this._currentTrend.trends[trend] = this.serializeFollowers(followers);
 
         this._entityStore.sync();
 
@@ -48,10 +56,15 @@ export class Singlefin extends Influencer {
     }
 
     public informTo(bridge: Bridge, trend: string) {
+        const followers = this._trends[trend];
+
         this._currentTrend.trend = trend;
+        this._currentTrend.trends[trend] = this.serializeFollowers(followers);
 
         return this._entityStore.syncTo(bridge).then(() => {
-            this.newTrend(trend, this._model);
+            this.init(this._currentTrend.trends);
+
+            this.newTrend(this._currentTrend.trend, this._model);
 
             return this._entityStore.syncTo(bridge);
         });
@@ -59,9 +72,23 @@ export class Singlefin extends Influencer {
 
     public informFrom(bridge: Bridge, actions: any) {
         this._entityStore.syncFrom(bridge, actions, () => {
+            this.init(this._currentTrend.trends);
+
             this.newTrend(this._currentTrend.trend, this._model);
 
-            this._entityStore.sync();     
+            const followers = this._trends[this._currentTrend.trend];
+
+            this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
         });
+    }
+
+    private serializeFollowers(followers: any[]) {
+        const serializedFollowers = [];
+
+        for(let i=0; i<followers.length; i++) {
+            serializedFollowers.push(followers[i].serialize());
+        }
+
+        return serializedFollowers;
     }
 }

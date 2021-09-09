@@ -14,9 +14,11 @@ export class Influencer {
             const followers = trends[key];
 
             for(let i=0; i<followers.length; i++) {
-                const follower = this._followers[followers[i].name];
+                if(this._followers[followers[i].name]) {
+                    const follower = this._followers[followers[i].name];
 
-                follower.deserialize(followers[i]);
+                    follower.deserialize(followers[i]);
+                }
             }
         }
     }
