@@ -4,6 +4,7 @@ import { EntityFactory } from "../../js-entity-store/src/entityfactory";
 import { Source } from "../../js-entity-store/src/source";
 import { Bridge } from "../../js-entity-store/src/bridge";
 import { SinglefinSource } from "./singlefinsource";
+import { ModelLoader } from "./modelloader";
 
 
 export class Singlefin extends Influencer {
@@ -28,6 +29,16 @@ export class Singlefin extends Influencer {
         });
 
         this._entityStore.addSource("Singlefin", new SinglefinSource());
+    }
+
+    public loadModel(modelLoader: ModelLoader) {
+        return new Promise<void>((resolve, reject) => {
+            modelLoader.load((model: any) => {
+                this._model = EntityFactory.newEntity(this._entityStore, model);
+
+                resolve();
+            });
+        });
     }
 
     public setModel(model: any) {
