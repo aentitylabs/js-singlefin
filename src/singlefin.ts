@@ -1,8 +1,8 @@
 import { Influencer } from "./influencer/influencer";
-import { EntityStore } from "../../js-entity-store/src/entitystore"
-import { EntityFactory } from "../../js-entity-store/src/entityfactory";
-import { Source } from "../../js-entity-store/src/source";
-import { Bridge } from "../../js-entity-store/src/bridge";
+import { EntityStore } from "js-entity-store"
+import { EntityFactory } from "js-entity-store";
+import { Source } from "js-entity-store";
+import { Bridge } from "js-entity-store";
 import { SinglefinSource } from "./singlefinsource";
 import { ModelLoader } from "./modelloader";
 

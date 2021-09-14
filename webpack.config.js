@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
     context: path.resolve('src'),
     devtool: 'inline-source-map',
-    entry: './singlefin.ts',
+    entry: './main.ts',
     mode: 'production',
     module: {
         rules: [{

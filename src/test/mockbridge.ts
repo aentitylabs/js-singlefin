@@ -1,4 +1,4 @@
-import { Bridge } from "../../../js-entity-store/src/bridge";
+import { Bridge } from "js-entity-store";
 
 export class MockBridge extends Bridge {
     private _onReceived: any;

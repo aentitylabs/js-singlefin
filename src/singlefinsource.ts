@@ -1,4 +1,4 @@
-import { Source } from "../../js-entity-store/src/source";
+import { Source } from "js-entity-store";
 
 export class SinglefinSource extends Source {
     public load(entity: any) {

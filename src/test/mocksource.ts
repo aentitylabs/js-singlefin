@@ -1,5 +1,4 @@
-import { Entity } from "../../../js-entity-store/src/entity";
-import { Source } from "../../../js-entity-store/src/source";
+import { Source } from "js-entity-store";
 
 export class MockSource extends Source {
     private _loadedEntities: any[] = [];
