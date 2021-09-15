@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     context: path.resolve('src'),
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     entry: './main.ts',
     mode: 'production',
     module: {
@@ -15,8 +15,9 @@ module.exports = {
     output: {
         filename: 'singlefin.js',
         path: path.resolve(__dirname, 'dist'),
+        globalObject: 'this',
         library: {
-            name: "singlefinlib",
+            name: "jssinglefin",
             type: "umd"
         }
     },

@@ -1,8 +1,9 @@
 {
   "name": "js-singlefin",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Singlefin JS",
-  "main": "index.js",
+  "main": "./dist/singlefin.js",
+  "types": "./lib/main.d.ts",
   "scripts": {
     "test": "mocha --require ts-node/register test/**/*.ts",
     "webpack": "node ./node_modules/webpack/bin/webpack.js"
