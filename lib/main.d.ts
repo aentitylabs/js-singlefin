@@ -1,3 +1,5 @@
 import { Singlefin } from "./singlefin";
 import { Follower } from "./influencer/follower";
-export { Singlefin, Follower };
+import { ModelLoader } from "./modelloader";
+import { State } from "./influencer/state";
+export { Singlefin, Follower, ModelLoader, State };
