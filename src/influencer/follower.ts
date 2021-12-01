@@ -12,8 +12,6 @@ export class Follower {
 
     public constructor(name: string) {
         this._name = name;
-
-        this._state.follower = this;
     }
 
     public get name() {
@@ -26,7 +24,6 @@ export class Follower {
 
     public addState(stateName: string, state: State) {
         state.name = stateName;
-        state.follower = this;
 
         this._states[stateName] = state;
     }
@@ -52,7 +49,7 @@ export class Follower {
     }
 
     public handle(trend: string, model: any): void {
-        this._state.handle(trend, model);
+        this._state.handle(this, trend, model);
     }
 
     public onTrendChange(trend: string, model: any): void {

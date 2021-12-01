@@ -2,7 +2,6 @@ import { Follower } from "./follower";
 
 export abstract class State {
     private _name: string = "";
-    private _follower: Follower | undefined;
 
 
     public set name(name: string) {
@@ -13,15 +12,5 @@ export abstract class State {
         return this._name;
     }
 
-    public set follower(follower: Follower) {
-        this._follower = follower;
-    }
-
-    public changeState(state: string) {
-        if(this._follower) {
-            this._follower.changeState(state);
-        }
-    }
-
-    public abstract handle(trend: string, model: any): void;
+    public abstract handle(follower: Follower, trend: string, model: any): void;
 }

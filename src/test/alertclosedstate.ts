@@ -1,9 +1,10 @@
 import { State } from "../influencer/state";
+import { Follower } from "../main";
 
 export class AlertClosedState extends State {
-    public handle(trend: string, model: any): void {
+    public handle(follower: Follower, trend: string, model: any): void {
         if(trend === "login") {
-            this.changeState("is showing wait alert");
+            follower.changeState("is showing wait alert");
         }
     }
     

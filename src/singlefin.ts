@@ -5,6 +5,7 @@ import { Source } from "js-entity-store";
 import { Bridge } from "js-entity-store";
 import { SinglefinSource } from "./singlefinsource";
 import { ModelLoader } from "./modelloader";
+import { HttpRoutingEngine } from "js-http-routing-engine";
 
 
 export class Singlefin extends Influencer {
@@ -51,6 +52,12 @@ export class Singlefin extends Influencer {
 
     public addSource(entityName: string, source: Source) {
         this._entityStore.addSource(entityName, source);
+    }
+
+    public run() {
+        const httpRoutingEngine = new HttpRoutingEngine();
+
+        httpRoutingEngine.render({}, undefined, this._model);
     }
 
     public inform(trend: string) {

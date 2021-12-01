@@ -1,9 +1,10 @@
 import { State } from "../influencer/state";
+import { Follower } from "../main";
 
 export class HomeState extends State {
-    public handle(trend: string, model: any): void {
+    public handle(follower: Follower, trend: string, model: any): void {
         if(model.user.id === "") {
-            this.changeState("is showing login form");
+            follower.changeState("is showing login form");
         }
     }
     
