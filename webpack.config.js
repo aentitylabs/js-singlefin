@@ -1,11 +1,10 @@
 const path = require('path');
-var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
     context: path.resolve('src'),
     devtool: 'source-map',
     entry: './main.ts',
-    mode: 'none',
+    mode: 'development',
     module: {
         rules: [{
             test: /\.tsx?$/,
@@ -25,8 +24,7 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.jsx', '.js']
     },
-    externalsPresets: {
-        node: true
+    externals: {
+        "js-entity-store": 'jsentitystore',
     },
-	externals: [nodeExternals()],
 };
