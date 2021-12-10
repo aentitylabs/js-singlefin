@@ -18,7 +18,8 @@
     "ts-loader": "^9.2.5",
     "ts-node": "^9.1.1",
     "webpack": "^5.51.1",
-    "webpack-cli": "^4.8.0"
+    "webpack-cli": "^4.8.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
     "js-entity-store": "git+https://github.com/aentitylabs/js-entity-store.git",
