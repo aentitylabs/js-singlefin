@@ -11,7 +11,6 @@ export declare class Singlefin extends Influencer {
     setModel(model: any): void;
     get model(): any;
     addSource(entityName: string, source: Source): void;
-    run(): void;
     inform(trend: string): void;
     informTo(bridge: Bridge, trend: string): Promise<void>;
     informFrom(bridge: Bridge, actions: any): void;
