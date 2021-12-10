@@ -21,7 +21,7 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
-    "js-entity-store": "git+https://github.com/aentitylabs/js-entity-store.git#v0.1.1",
+    "js-entity-store": "git+https://github.com/aentitylabs/js-entity-store.git",
     "js-template-engine": "git+https://github.com/aentitylabs/js-template-engine"
   }
 }
