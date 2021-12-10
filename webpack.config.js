@@ -1,9 +1,8 @@
 const path = require('path');
-var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
     context: path.resolve('src'),
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     entry: './main.ts',
     mode: 'production',
     module: {
@@ -13,7 +12,6 @@ module.exports = {
             exclude: /node_modules/
         }]
     },
-    target: 'node',
     output: {
         filename: 'singlefin.js',
         path: path.resolve(__dirname, 'dist'),
@@ -26,8 +24,4 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.jsx', '.js']
     },
-    externalsPresets: {
-        node: true
-    },
-	externals: [nodeExternals()],
 };
