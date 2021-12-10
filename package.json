@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "js-entity-store": "git+https://github.com/aentitylabs/js-entity-store.git#v0.1.1",
-    "js-http-routing-engine": "git+https://github.com/aentitylabs/js-http-routing-engine",
     "js-template-engine": "git+https://github.com/aentitylabs/js-template-engine"
   }
 }
