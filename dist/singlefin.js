@@ -2,11 +2,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("js-entity-store"));
 	else if(typeof define === 'function' && define.amd)
-		define(["js-entity-store"], factory);
+		define(["jsentitystore"], factory);
 	else if(typeof exports === 'object')
 		exports["jssinglefin"] = factory(require("js-entity-store"));
 	else
-		root["jssinglefin"] = factory(root["js-entity-store"]);
+		root["jssinglefin"] = factory(root["jsentitystore"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_js_entity_store__) {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
@@ -299,9 +299,9 @@ exports.SinglefinSource = SinglefinSource;
 /***/ }),
 
 /***/ "js-entity-store":
-/*!**********************************!*\
-  !*** external "js-entity-store" ***!
-  \**********************************/
+/*!**************************************************************************************************************************!*\
+  !*** external {"commonjs":"js-entity-store","commonjs2":"js-entity-store","amd":"jsentitystore","root":"jsentitystore"} ***!
+  \**************************************************************************************************************************/
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_MODULE_js_entity_store__;

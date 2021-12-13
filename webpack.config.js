@@ -25,6 +25,11 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.jsx', '.js']
     },
     externals: {
-        "js-entity-store": 'js-entity-store',
+        "js-entity-store": {
+            commonjs: 'js-entity-store',
+            commonjs2: 'js-entity-store',
+            amd: 'jsentitystore',
+            root: 'jsentitystore'
+        }
     },
 };
