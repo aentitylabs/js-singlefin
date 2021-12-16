@@ -1,18 +1,12 @@
-import { Influencer } from "./influencer/influencer";
-import { Source } from "js-entity-store";
-import { Bridge } from "js-entity-store";
-import { ModelLoader } from "./modelloader";
-export declare class Singlefin extends Influencer {
-    private _entityStore;
-    private _model;
-    private _currentTrend;
-    constructor();
-    loadModel(modelLoader: ModelLoader): Promise<void>;
-    setModel(model: any): void;
-    get model(): any;
-    addSource(entityName: string, source: Source): void;
-    inform(trend: string): void;
-    informTo(bridge: Bridge, trend: string): Promise<void>;
-    informFrom(bridge: Bridge, actions: any): void;
-    private serializeFollowers;
+import { Session } from "./session";
+export declare class Singlefin {
+    private static _handlers;
+    private static _sources;
+    private static _bridges;
+    private static _states;
+    newSession(name: string, configuration: any): Session;
+    static set handlers(value: any);
+    static set sources(value: any);
+    static set bridges(value: any);
+    static set states(value: any);
 }

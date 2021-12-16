@@ -186,24 +186,42 @@ exports.State = State;
 
 /***/ }),
 
-/***/ "./singlefin.ts":
-/*!**********************!*\
-  !*** ./singlefin.ts ***!
-  \**********************/
+/***/ "./main.ts":
+/*!*****************!*\
+  !*** ./main.ts ***!
+  \*****************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Singlefin = void 0;
-const influencer_1 = __webpack_require__(/*! ./influencer/influencer */ "./influencer/influencer.ts");
+exports.State = exports.Follower = exports.Singlefin = void 0;
+const singlefin_1 = __webpack_require__(/*! ./singlefin */ "./singlefin.ts");
+Object.defineProperty(exports, "Singlefin", ({ enumerable: true, get: function () { return singlefin_1.Singlefin; } }));
+const follower_1 = __webpack_require__(/*! ./influencer/follower */ "./influencer/follower.ts");
+Object.defineProperty(exports, "Follower", ({ enumerable: true, get: function () { return follower_1.Follower; } }));
+const state_1 = __webpack_require__(/*! ./influencer/state */ "./influencer/state.ts");
+Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { return state_1.State; } }));
+
+
+/***/ }),
+
+/***/ "./session.ts":
+/*!********************!*\
+  !*** ./session.ts ***!
+  \********************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Session = void 0;
 const js_entity_store_1 = __webpack_require__(/*! js-entity-store */ "js-entity-store");
-const js_entity_store_2 = __webpack_require__(/*! js-entity-store */ "js-entity-store");
+const influencer_1 = __webpack_require__(/*! ./influencer/influencer */ "./influencer/influencer.ts");
 const singlefinsource_1 = __webpack_require__(/*! ./singlefinsource */ "./singlefinsource.ts");
-class Singlefin extends influencer_1.Influencer {
+class Session extends influencer_1.Influencer {
     constructor() {
         super();
         this._entityStore = new js_entity_store_1.EntityStore();
-        this._currentTrend = js_entity_store_2.EntityFactory.newEntity(this._entityStore, {
+        this._currentTrend = js_entity_store_1.EntityFactory.newEntity(this._entityStore, {
             "entity": "Singlefin",
             "ref": false,
             "properties": {
@@ -217,16 +235,8 @@ class Singlefin extends influencer_1.Influencer {
         });
         this._entityStore.addSource("Singlefin", new singlefinsource_1.SinglefinSource());
     }
-    loadModel(modelLoader) {
-        return new Promise((resolve, reject) => {
-            modelLoader.load((model) => {
-                this._model = js_entity_store_2.EntityFactory.newEntity(this._entityStore, model);
-                resolve();
-            });
-        });
-    }
     setModel(model) {
-        this._model = js_entity_store_2.EntityFactory.newEntity(this._entityStore, model);
+        this._model = js_entity_store_1.EntityFactory.newEntity(this._entityStore, model);
     }
     get model() {
         return this._model;
@@ -268,7 +278,71 @@ class Singlefin extends influencer_1.Influencer {
         return serializedFollowers;
     }
 }
+exports.Session = Session;
+
+
+/***/ }),
+
+/***/ "./singlefin.ts":
+/*!**********************!*\
+  !*** ./singlefin.ts ***!
+  \**********************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Singlefin = void 0;
+const session_1 = __webpack_require__(/*! ./session */ "./session.ts");
+const main_1 = __webpack_require__(/*! ./main */ "./main.ts");
+class Singlefin {
+    newSession(name, configuration) {
+        const session = new session_1.Session();
+        for (const source in Singlefin._sources) {
+            session.addSource(Singlefin._sources[source].name, new Singlefin._sources[source]());
+        }
+        const app = new main_1.Follower(name);
+        app.subscribe(session);
+        for (const state in Singlefin._states) {
+            app.addState(Singlefin._states[state].name, new Singlefin._states[state]());
+        }
+        const trends = {};
+        for (const trend in configuration.trends) {
+            app.follow(trend);
+            if (configuration.trends[trend].hasOwnProperty("defaultstate")) {
+                app.on(trend, configuration.trends[trend]["defaultstate"]);
+            }
+            if (configuration.trends[trend].hasOwnProperty("initialstate")) {
+                trends[trend] = [];
+                trends[trend].push({
+                    name: name,
+                    state: configuration.trends[trend]["initialstate"]
+                });
+            }
+            if (configuration.trends[trend].hasOwnProperty("defaultstate")) {
+                app.on(trend, configuration.trends[trend]["defaultstate"]);
+            }
+        }
+        session.init(trends);
+        return session;
+    }
+    static set handlers(value) {
+        Singlefin._handlers[value.name] = value;
+    }
+    static set sources(value) {
+        Singlefin._sources[value.name] = value;
+    }
+    static set bridges(value) {
+        Singlefin._bridges[value.name] = value;
+    }
+    static set states(value) {
+        Singlefin._states[value.name] = value;
+    }
+}
 exports.Singlefin = Singlefin;
+Singlefin._handlers = {};
+Singlefin._sources = {};
+Singlefin._bridges = {};
+Singlefin._states = {};
 
 
 /***/ }),
@@ -335,25 +409,12 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_js_entity_store__;
 /******/ 	}
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-var exports = __webpack_exports__;
-/*!*****************!*\
-  !*** ./main.ts ***!
-  \*****************/
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.State = exports.Follower = exports.Singlefin = void 0;
-const singlefin_1 = __webpack_require__(/*! ./singlefin */ "./singlefin.ts");
-Object.defineProperty(exports, "Singlefin", ({ enumerable: true, get: function () { return singlefin_1.Singlefin; } }));
-const follower_1 = __webpack_require__(/*! ./influencer/follower */ "./influencer/follower.ts");
-Object.defineProperty(exports, "Follower", ({ enumerable: true, get: function () { return follower_1.Follower; } }));
-const state_1 = __webpack_require__(/*! ./influencer/state */ "./influencer/state.ts");
-Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { return state_1.State; } }));
-
-})();
-
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__("./main.ts");
+/******/ 	
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;

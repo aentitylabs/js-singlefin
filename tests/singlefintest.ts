@@ -10,17 +10,20 @@ import { AlertWaitState } from '../src/test/alertwaitstate';
 import { MockSource } from '../src/test/mocksource';
 import { MockBridge } from '../src/test/mockbridge';
 import { Follower } from '../src/influencer/follower';
+import { Session } from '../src/session';
 
 
 describe('Broker', () => {
     it('test singlefin', () => {        
         const singlefin = new Singlefin();
 
+        const session: Session = new Session();
+
         const source: MockSource = new MockSource();
 
-        singlefin.addSource("User", source);
+        session.addSource("User", source);
 
-        singlefin.setModel({
+        session.setModel({
             "entity": "App",
             "ref": false,
             "properties": {
@@ -55,10 +58,10 @@ describe('Broker', () => {
             "username": "",
             "password": ""
         }];
-        
+
         const app = new Follower("App");
         
-        app.subscribe(singlefin);
+        app.subscribe(session);
 
         app.addState("is showing login form", new LoginFormState());
         app.addState("is showing homepage", new HomeState());
@@ -68,7 +71,7 @@ describe('Broker', () => {
 
         const appAlert = new Follower("AppAlert");
         
-        appAlert.subscribe(singlefin);
+        appAlert.subscribe(session);
 
         appAlert.addState("is closed", new AlertClosedState());
         appAlert.addState("is showing wait alert", new AlertWaitState());
@@ -76,7 +79,7 @@ describe('Broker', () => {
         appAlert.follow("login");
         appAlert.follow("access to homepage");
 
-        singlefin.init({
+        session.init({
             "open app": [{
                 "name": "App",
                 "state": "is showing homepage"
@@ -87,7 +90,7 @@ describe('Broker', () => {
             }]
         });
 
-        singlefin.inform("open app");
+        session.inform("open app");
 
         expect({
             "followers": {
@@ -100,10 +103,10 @@ describe('Broker', () => {
                     "state": "is closed"
                 }
             }
-        }).to.eql(singlefin.serialize());
+        }).to.eql(session.serialize());
 
-        singlefin.model.user.username = "tom";
-        singlefin.model.user.password = "password";
+        session.model.user.username = "tom";
+        session.model.user.password = "password";
 
         source.updatedEntity = {
             "id": 1,
@@ -113,7 +116,7 @@ describe('Broker', () => {
             "password": ""
         };
 
-        singlefin.inform("login");
+        session.inform("login");
 
         expect({
             "followers": {
@@ -126,9 +129,9 @@ describe('Broker', () => {
                     "state": "is showing wait alert"
                 }
             }
-        }).to.eql(singlefin.serialize());
+        }).to.eql(session.serialize());
 
-        singlefin.inform("access to homepage");
+        session.inform("access to homepage");
 
         expect({
             "followers": {
@@ -141,17 +144,19 @@ describe('Broker', () => {
                     "state": "is closed"
                 }
             }
-        }).to.eql(singlefin.serialize());
+        }).to.eql(session.serialize());
     })
 
     it('test singlefin with trend listener', () => {        
         const singlefin = new Singlefin();
 
+        const session: Session = new Session();
+
         const source: MockSource = new MockSource();
 
-        singlefin.addSource("User", source);
+        session.addSource("User", source);
 
-        singlefin.setModel({
+        session.setModel({
             "entity": "App",
             "ref": false,
             "properties": {
@@ -189,7 +194,7 @@ describe('Broker', () => {
         
         const app = new Follower("App");
 
-        app.subscribe(singlefin);
+        app.subscribe(session);
 
         app.addState("is showing login form", new LoginFormState());
         app.addState("is showing homepage", new HomeState());
@@ -199,7 +204,7 @@ describe('Broker', () => {
 
         const appAlert = new Follower("AppAlert");
 
-        appAlert.subscribe(singlefin);
+        appAlert.subscribe(session);
 
         appAlert.addState("is closed", new AlertClosedState());
         appAlert.addState("is showing wait alert", new AlertWaitState());
@@ -210,7 +215,7 @@ describe('Broker', () => {
         appAlert.follow("login");
         appAlert.follow("access to homepage");
 
-        singlefin.init({
+        session.init({
             "open app": [{
                 "name": "App",
                 "state": "is showing homepage"
@@ -221,7 +226,7 @@ describe('Broker', () => {
             }]
         });
 
-        singlefin.inform("open app");
+        session.inform("open app");
 
         expect({
             "followers": {
@@ -234,10 +239,10 @@ describe('Broker', () => {
                     "state": "is closed"
                 }
             }
-        }).to.eql(singlefin.serialize());
+        }).to.eql(session.serialize());
 
-        singlefin.model.user.username = "tom";
-        singlefin.model.user.password = "password";
+        session.model.user.username = "tom";
+        session.model.user.password = "password";
 
         source.updatedEntity = {
             "id": 1,
@@ -247,7 +252,7 @@ describe('Broker', () => {
             "password": ""
         };
 
-        singlefin.inform("login");
+        session.inform("login");
 
         expect({
             "followers": {
@@ -260,9 +265,9 @@ describe('Broker', () => {
                     "state": "is showing wait alert"
                 }
             }
-        }).to.eql(singlefin.serialize());
+        }).to.eql(session.serialize());
 
-        singlefin.inform("access to homepage");
+        session.inform("access to homepage");
 
         expect({
             "followers": {
@@ -275,21 +280,24 @@ describe('Broker', () => {
                     "state": "is closed"
                 }
             }
-        }).to.eql(singlefin.serialize());
+        }).to.eql(session.serialize());
     })
 
     it('test singlefin with bridge', () => {
         const bridge = new MockBridge();
 
         const singlefinServer = new Singlefin();
+        const serverSession: Session = new Session();
+
         const singlefinClient = new Singlefin();
+        const clientSession: Session = new Session();
 
         const source: MockSource = new MockSource();
 
-        singlefinServer.addSource("User", source);
-        singlefinClient.addSource("User", source);
+        serverSession.addSource("User", source);
+        clientSession.addSource("User", source);
 
-        singlefinServer.setModel({
+        serverSession.setModel({
             "entity": "App",
             "ref": false,
             "properties": {
@@ -316,7 +324,7 @@ describe('Broker', () => {
                 }
             }
         });
-        singlefinClient.setModel({
+        clientSession.setModel({
             "entity": "App",
             "ref": false,
             "properties": {
@@ -366,7 +374,7 @@ describe('Broker', () => {
 
         const app = new Follower("App");
 
-        app.subscribe(singlefinServer);
+        app.subscribe(serverSession);
 
         app.addState("is showing login form", new LoginFormState());
         app.addState("is showing homepage", new HomeState());
@@ -377,7 +385,7 @@ describe('Broker', () => {
 
         const appClient = new Follower("App");
 
-        appClient.subscribe(singlefinClient);
+        appClient.subscribe(clientSession);
 
         appClient.addState("is showing login form", new ClientLoginFormState());
         appClient.addState("is showing homepage", new ClientHomeState());
@@ -388,7 +396,7 @@ describe('Broker', () => {
 
         const appAlert = new Follower("AppAlert");
 
-        appAlert.subscribe(singlefinClient);
+        appAlert.subscribe(clientSession);
 
         appAlert.addState("is closed", new AlertClosedState());
         appAlert.addState("is showing wait alert", new AlertWaitState());
@@ -399,14 +407,14 @@ describe('Broker', () => {
         appAlert.follow("login");
         appAlert.follow("access to homepage");
 
-        singlefinServer.init({
+        serverSession.init({
             "open app": [{
                 "name": "App",
                 "state": "is showing homepage"
             }]
         });
 
-        singlefinClient.init({
+        clientSession.init({
             "open app": [{
                 "name": "App",
                 "state": "is showing homepage"
@@ -418,10 +426,10 @@ describe('Broker', () => {
         });
 
         bridge.onReceived((actions: any) => {
-            singlefinServer.informFrom(bridge, actions);
+            serverSession.informFrom(bridge, actions);
         });
 
-        singlefinClient.informTo(bridge, "open app").then(() => {
+        clientSession.informTo(bridge, "open app").then(() => {
             expect({
                 "followers": {
                     "App": {
@@ -429,7 +437,7 @@ describe('Broker', () => {
                         "state": "is showing login form"
                     }
                 }
-            }).to.eql(singlefinServer.serialize());
+            }).to.eql(serverSession.serialize());
     
             expect({
                 "followers": {
@@ -442,10 +450,10 @@ describe('Broker', () => {
                         "state": "is closed"
                     }
                 }
-            }).to.eql(singlefinClient.serialize());
+            }).to.eql(clientSession.serialize());
     
-            singlefinClient.model.user.username = "tom";
-            singlefinClient.model.user.password = "password";
+            clientSession.model.user.username = "tom";
+            clientSession.model.user.password = "password";
     
             source.updatedEntity = {
                 "id": 1,
@@ -455,7 +463,7 @@ describe('Broker', () => {
                 "password": ""
             };
     
-            singlefinClient.informTo(bridge, "login").then(() => {
+            clientSession.informTo(bridge, "login").then(() => {
                 expect({
                     "followers": {
                         "App": {
@@ -463,7 +471,7 @@ describe('Broker', () => {
                             "state": "is showing homepage"
                         }
                     }
-                }).to.eql(singlefinServer.serialize());
+                }).to.eql(serverSession.serialize());
         
                 expect({
                     "followers": {
@@ -476,9 +484,9 @@ describe('Broker', () => {
                             "state": "is showing wait alert"
                         }
                     }
-                }).to.eql(singlefinClient.serialize());
+                }).to.eql(clientSession.serialize());
         
-                singlefinClient.informTo(bridge, "access to homepage").then(() => {
+                clientSession.informTo(bridge, "access to homepage").then(() => {
                     expect({
                         "followers": {
                             "App": {
@@ -486,7 +494,7 @@ describe('Broker', () => {
                                 "state": "is showing homepage"
                             }
                         }
-                    }).to.eql(singlefinServer.serialize());
+                    }).to.eql(serverSession.serialize());
             
                     expect({
                         "followers": {
@@ -499,7 +507,7 @@ describe('Broker', () => {
                                 "state": "is closed"
                             }
                         }
-                    }).to.eql(singlefinClient.serialize());
+                    }).to.eql(clientSession.serialize());
                 });
             }); 
         });

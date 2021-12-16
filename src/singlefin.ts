@@ -1,105 +1,68 @@
-import { Influencer } from "./influencer/influencer";
-import { EntityStore } from "js-entity-store"
-import { EntityFactory } from "js-entity-store";
-import { Source } from "js-entity-store";
-import { Bridge } from "js-entity-store";
-import { SinglefinSource } from "./singlefinsource";
-import { ModelLoader } from "./modelloader";
+import { Session } from "./session";
+import { Follower } from "./main";
 
 
-export class Singlefin extends Influencer {
-    private _entityStore: EntityStore = new EntityStore();
-    private _model: any;
-    private _currentTrend: any;
+export class Singlefin {
+    private static _handlers: any = {};
+    private static _sources: any = {};
+    private static _bridges: any = {};
+    private static _states: any = {};
 
-    public constructor() {
-        super();
 
-        this._currentTrend = EntityFactory.newEntity(this._entityStore, {
-            "entity": "Singlefin",
-            "ref": false,
-            "properties": {
-                "trend": {
-                    "value": ""
-                },
-                "trends": {
-                    "value": {}
-                }
-            }
-        });
+    public newSession(name: string, configuration: any) {
+        const session = new Session();
 
-        this._entityStore.addSource("Singlefin", new SinglefinSource());
-    }
-
-    public loadModel(modelLoader: ModelLoader) {
-        return new Promise<void>((resolve, reject) => {
-            modelLoader.load((model: any) => {
-                this._model = EntityFactory.newEntity(this._entityStore, model);
-
-                resolve();
-            });
-        });
-    }
-
-    public setModel(model: any) {
-        this._model = EntityFactory.newEntity(this._entityStore, model);
-    }
-
-    public get model(): any {
-        return this._model;
-    }
-
-    public addSource(entityName: string, source: Source) {
-        this._entityStore.addSource(entityName, source);
-    }
-
-    public inform(trend: string) {
-        const followers = this._trends[trend];
-
-        this._currentTrend.trend = trend;
-        this._currentTrend.trends[trend] = this.serializeFollowers(followers);
-
-        this._entityStore.sync();
-
-        this.newTrend(trend, this._model);
-
-        this._entityStore.sync();
-    }
-
-    public informTo(bridge: Bridge, trend: string) {
-        const followers = this._trends[trend];
-
-        this._currentTrend.trend = trend;
-        this._currentTrend.trends[trend] = this.serializeFollowers(followers);
-
-        return this._entityStore.syncTo(bridge).then(() => {
-            this.init(this._currentTrend.trends);
-
-            this.newTrend(this._currentTrend.trend, this._model);
-
-            return this._entityStore.syncTo(bridge);
-        });
-    }
-
-    public informFrom(bridge: Bridge, actions: any) {
-        this._entityStore.syncFrom(bridge, actions, () => {
-            this.init(this._currentTrend.trends);
-
-            this.newTrend(this._currentTrend.trend, this._model);
-
-            const followers = this._trends[this._currentTrend.trend];
-
-            this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
-        });
-    }
-
-    private serializeFollowers(followers: any[]) {
-        const serializedFollowers = [];
-
-        for(let i=0; i<followers.length; i++) {
-            serializedFollowers.push(followers[i].serialize());
+        for(const source in Singlefin._sources) {
+            session.addSource(Singlefin._sources[source].name, new Singlefin._sources[source]());
         }
 
-        return serializedFollowers;
+        const app = new Follower(name);
+        
+        app.subscribe(session);
+
+        for(const state in Singlefin._states) {
+            app.addState(Singlefin._states[state].name, new Singlefin._states[state]());
+        }
+        
+        const trends: any = {};
+
+        for(const trend in configuration.trends) {
+            app.follow(trend);
+
+            if(configuration.trends[trend].hasOwnProperty("defaultstate")) {
+                app.on(trend, configuration.trends[trend]["defaultstate"]);
+            }
+
+            if(configuration.trends[trend].hasOwnProperty("initialstate")) {
+                trends[trend] = [];
+                trends[trend].push({
+                    name: name,
+                    state: configuration.trends[trend]["initialstate"]
+                });
+            }
+
+            if(configuration.trends[trend].hasOwnProperty("defaultstate")) {
+                app.on(trend, configuration.trends[trend]["defaultstate"]);
+            }
+        }
+
+        session.init(trends);
+
+        return session;
+    }
+
+    public static set handlers(value: any) {
+        Singlefin._handlers[value.name] = value;
+    }
+    public static set sources(value: any) {
+        Singlefin._sources[value.name] = value;
+    }
+
+    public static set bridges(value: any) {
+        Singlefin._bridges[value.name] = value;
+    }
+
+    public static set states(value: any) {
+        Singlefin._states[value.name] = value;
     }
 }
