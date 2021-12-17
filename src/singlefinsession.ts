@@ -1,9 +1,8 @@
 import { Bridge, EntityFactory, EntityStore, Source } from "js-entity-store";
 import { Influencer } from "./influencer/influencer";
-import { ModelLoader } from "./modelloader";
 import { SinglefinSource } from "./singlefinsource";
 
-export class Session extends Influencer {
+export class SinglefinSession extends Influencer {
     private _entityStore: EntityStore = new EntityStore();
     private _model: any;
     private _currentTrend: any;
@@ -27,7 +26,7 @@ export class Session extends Influencer {
         this._entityStore.addSource("Singlefin", new SinglefinSource());
     }
 
-    public setModel(model: any) {
+    public loadModel(model: any) {
         this._model = EntityFactory.newEntity(this._entityStore, model);
     }
 

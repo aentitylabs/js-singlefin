@@ -1,16 +1,21 @@
-import { Session } from "./session";
+import { SinglefinSession } from "./singlefinsession";
 import { Follower } from "./main";
+
+declare const SINGLEFIN_MODEL: any;
 
 
 export class Singlefin {
     private static _handlers: any = {};
+    private static _model: any = SINGLEFIN_MODEL;
     private static _sources: any = {};
     private static _bridges: any = {};
     private static _states: any = {};
 
 
-    public newSession(name: string, configuration: any) {
-        const session = new Session();
+    public static newSession(name: string, configuration: any) {
+        const session = new SinglefinSession();
+
+        session.loadModel(Singlefin._model);
 
         for(const source in Singlefin._sources) {
             session.addSource(Singlefin._sources[source].name, new Singlefin._sources[source]());
@@ -54,6 +59,11 @@ export class Singlefin {
     public static set handlers(value: any) {
         Singlefin._handlers[value.name] = value;
     }
+
+    public static set model(value: any) {
+        Singlefin._model[value.name] = value;
+    }
+
     public static set sources(value: any) {
         Singlefin._sources[value.name] = value;
     }

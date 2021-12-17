@@ -1,6 +1,5 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { Singlefin } from '../src/singlefin';
 import { LoginFormState } from '../src/test/loginformstate';
 import { HomeState } from '../src/test/homestate';
 import { ClientLoginFormState } from '../src/test/clientloginformstate';
@@ -10,20 +9,18 @@ import { AlertWaitState } from '../src/test/alertwaitstate';
 import { MockSource } from '../src/test/mocksource';
 import { MockBridge } from '../src/test/mockbridge';
 import { Follower } from '../src/influencer/follower';
-import { Session } from '../src/session';
+import { SinglefinSession } from '../src/singlefinsession';
 
 
 describe('Broker', () => {
     it('test singlefin', () => {        
-        const singlefin = new Singlefin();
-
-        const session: Session = new Session();
+        const session: SinglefinSession = new SinglefinSession();
 
         const source: MockSource = new MockSource();
 
         session.addSource("User", source);
 
-        session.setModel({
+        session.loadModel({
             "entity": "App",
             "ref": false,
             "properties": {
@@ -147,16 +144,14 @@ describe('Broker', () => {
         }).to.eql(session.serialize());
     })
 
-    it('test singlefin with trend listener', () => {        
-        const singlefin = new Singlefin();
-
-        const session: Session = new Session();
+    it('test singlefin with trend listener', () => {
+        const session: SinglefinSession = new SinglefinSession();
 
         const source: MockSource = new MockSource();
 
         session.addSource("User", source);
 
-        session.setModel({
+        session.loadModel({
             "entity": "App",
             "ref": false,
             "properties": {
@@ -286,18 +281,16 @@ describe('Broker', () => {
     it('test singlefin with bridge', () => {
         const bridge = new MockBridge();
 
-        const singlefinServer = new Singlefin();
-        const serverSession: Session = new Session();
+        const serverSession: SinglefinSession = new SinglefinSession();
 
-        const singlefinClient = new Singlefin();
-        const clientSession: Session = new Session();
+        const clientSession: SinglefinSession = new SinglefinSession();
 
         const source: MockSource = new MockSource();
 
         serverSession.addSource("User", source);
         clientSession.addSource("User", source);
 
-        serverSession.setModel({
+        serverSession.loadModel({
             "entity": "App",
             "ref": false,
             "properties": {
@@ -324,7 +317,7 @@ describe('Broker', () => {
                 }
             }
         });
-        clientSession.setModel({
+        clientSession.loadModel({
             "entity": "App",
             "ref": false,
             "properties": {

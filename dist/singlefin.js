@@ -194,9 +194,11 @@ exports.State = State;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.State = exports.Follower = exports.Singlefin = void 0;
+exports.State = exports.Follower = exports.SinglefinSession = exports.Singlefin = void 0;
 const singlefin_1 = __webpack_require__(/*! ./singlefin */ "./singlefin.ts");
 Object.defineProperty(exports, "Singlefin", ({ enumerable: true, get: function () { return singlefin_1.Singlefin; } }));
+const singlefinsession_1 = __webpack_require__(/*! ./singlefinsession */ "./singlefinsession.ts");
+Object.defineProperty(exports, "SinglefinSession", ({ enumerable: true, get: function () { return singlefinsession_1.SinglefinSession; } }));
 const follower_1 = __webpack_require__(/*! ./influencer/follower */ "./influencer/follower.ts");
 Object.defineProperty(exports, "Follower", ({ enumerable: true, get: function () { return follower_1.Follower; } }));
 const state_1 = __webpack_require__(/*! ./influencer/state */ "./influencer/state.ts");
@@ -205,19 +207,88 @@ Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { 
 
 /***/ }),
 
-/***/ "./session.ts":
-/*!********************!*\
-  !*** ./session.ts ***!
-  \********************/
+/***/ "./singlefin.ts":
+/*!**********************!*\
+  !*** ./singlefin.ts ***!
+  \**********************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Session = void 0;
+exports.Singlefin = void 0;
+const singlefinsession_1 = __webpack_require__(/*! ./singlefinsession */ "./singlefinsession.ts");
+const main_1 = __webpack_require__(/*! ./main */ "./main.ts");
+class Singlefin {
+    static newSession(name, configuration) {
+        const session = new singlefinsession_1.SinglefinSession();
+        session.loadModel(Singlefin._model);
+        for (const source in Singlefin._sources) {
+            session.addSource(Singlefin._sources[source].name, new Singlefin._sources[source]());
+        }
+        const app = new main_1.Follower(name);
+        app.subscribe(session);
+        for (const state in Singlefin._states) {
+            app.addState(Singlefin._states[state].name, new Singlefin._states[state]());
+        }
+        const trends = {};
+        for (const trend in configuration.trends) {
+            app.follow(trend);
+            if (configuration.trends[trend].hasOwnProperty("defaultstate")) {
+                app.on(trend, configuration.trends[trend]["defaultstate"]);
+            }
+            if (configuration.trends[trend].hasOwnProperty("initialstate")) {
+                trends[trend] = [];
+                trends[trend].push({
+                    name: name,
+                    state: configuration.trends[trend]["initialstate"]
+                });
+            }
+            if (configuration.trends[trend].hasOwnProperty("defaultstate")) {
+                app.on(trend, configuration.trends[trend]["defaultstate"]);
+            }
+        }
+        session.init(trends);
+        return session;
+    }
+    static set handlers(value) {
+        Singlefin._handlers[value.name] = value;
+    }
+    static set model(value) {
+        Singlefin._model[value.name] = value;
+    }
+    static set sources(value) {
+        Singlefin._sources[value.name] = value;
+    }
+    static set bridges(value) {
+        Singlefin._bridges[value.name] = value;
+    }
+    static set states(value) {
+        Singlefin._states[value.name] = value;
+    }
+}
+exports.Singlefin = Singlefin;
+Singlefin._handlers = {};
+Singlefin._model = SINGLEFIN_MODEL;
+Singlefin._sources = {};
+Singlefin._bridges = {};
+Singlefin._states = {};
+
+
+/***/ }),
+
+/***/ "./singlefinsession.ts":
+/*!*****************************!*\
+  !*** ./singlefinsession.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SinglefinSession = void 0;
 const js_entity_store_1 = __webpack_require__(/*! js-entity-store */ "js-entity-store");
 const influencer_1 = __webpack_require__(/*! ./influencer/influencer */ "./influencer/influencer.ts");
 const singlefinsource_1 = __webpack_require__(/*! ./singlefinsource */ "./singlefinsource.ts");
-class Session extends influencer_1.Influencer {
+class SinglefinSession extends influencer_1.Influencer {
     constructor() {
         super();
         this._entityStore = new js_entity_store_1.EntityStore();
@@ -235,7 +306,7 @@ class Session extends influencer_1.Influencer {
         });
         this._entityStore.addSource("Singlefin", new singlefinsource_1.SinglefinSource());
     }
-    setModel(model) {
+    loadModel(model) {
         this._model = js_entity_store_1.EntityFactory.newEntity(this._entityStore, model);
     }
     get model() {
@@ -278,71 +349,7 @@ class Session extends influencer_1.Influencer {
         return serializedFollowers;
     }
 }
-exports.Session = Session;
-
-
-/***/ }),
-
-/***/ "./singlefin.ts":
-/*!**********************!*\
-  !*** ./singlefin.ts ***!
-  \**********************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Singlefin = void 0;
-const session_1 = __webpack_require__(/*! ./session */ "./session.ts");
-const main_1 = __webpack_require__(/*! ./main */ "./main.ts");
-class Singlefin {
-    newSession(name, configuration) {
-        const session = new session_1.Session();
-        for (const source in Singlefin._sources) {
-            session.addSource(Singlefin._sources[source].name, new Singlefin._sources[source]());
-        }
-        const app = new main_1.Follower(name);
-        app.subscribe(session);
-        for (const state in Singlefin._states) {
-            app.addState(Singlefin._states[state].name, new Singlefin._states[state]());
-        }
-        const trends = {};
-        for (const trend in configuration.trends) {
-            app.follow(trend);
-            if (configuration.trends[trend].hasOwnProperty("defaultstate")) {
-                app.on(trend, configuration.trends[trend]["defaultstate"]);
-            }
-            if (configuration.trends[trend].hasOwnProperty("initialstate")) {
-                trends[trend] = [];
-                trends[trend].push({
-                    name: name,
-                    state: configuration.trends[trend]["initialstate"]
-                });
-            }
-            if (configuration.trends[trend].hasOwnProperty("defaultstate")) {
-                app.on(trend, configuration.trends[trend]["defaultstate"]);
-            }
-        }
-        session.init(trends);
-        return session;
-    }
-    static set handlers(value) {
-        Singlefin._handlers[value.name] = value;
-    }
-    static set sources(value) {
-        Singlefin._sources[value.name] = value;
-    }
-    static set bridges(value) {
-        Singlefin._bridges[value.name] = value;
-    }
-    static set states(value) {
-        Singlefin._states[value.name] = value;
-    }
-}
-exports.Singlefin = Singlefin;
-Singlefin._handlers = {};
-Singlefin._sources = {};
-Singlefin._bridges = {};
-Singlefin._states = {};
+exports.SinglefinSession = SinglefinSession;
 
 
 /***/ }),
