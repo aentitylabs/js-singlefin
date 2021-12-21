@@ -205,8 +205,6 @@ const state_1 = __webpack_require__(/*! ./influencer/state */ "./influencer/stat
 Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { return state_1.State; } }));
 const modules_1 = __webpack_require__(/*! ./modules */ "./modules.ts");
 const js_html_template_engine_1 = __webpack_require__(/*! js-html-template-engine */ "js-html-template-engine");
-__webpack_require__.g.SINGLEFIN_APP_NAME = SINGLEFIN_APP_NAME;
-__webpack_require__.g.SINGLEFIN_MODEL = SINGLEFIN_MODEL;
 const singlefin = {
     exports: modules_1.Modules,
     newSession: (() => {
@@ -239,14 +237,26 @@ class Modules {
     static set handlers(value) {
         Modules._handlers[value.name] = value;
     }
+    static get handlers() {
+        return Modules._handlers;
+    }
     static set sources(value) {
         Modules._sources[value.name] = value;
+    }
+    static get sources() {
+        return Modules._sources;
     }
     static set states(value) {
         Modules._states[value.name] = value;
     }
+    static get states() {
+        return Modules._states;
+    }
     static set bridges(value) {
         Modules._bridges[value.name] = value;
+    }
+    static get bridges() {
+        return Modules._bridges;
     }
 }
 exports.Modules = Modules;
@@ -455,19 +465,6 @@ module.exports = require("js-html-template-engine");
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/global */
-/******/ 	(() => {
-/******/ 		__webpack_require__.g = (function() {
-/******/ 			if (typeof globalThis === 'object') return globalThis;
-/******/ 			try {
-/******/ 				return this || new Function('return this')();
-/******/ 			} catch (e) {
-/******/ 				if (typeof window === 'object') return window;
-/******/ 			}
-/******/ 		})();
-/******/ 	})();
 /******/ 	
 /************************************************************************/
 /******/ 	
