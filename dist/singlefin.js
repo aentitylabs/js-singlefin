@@ -203,16 +203,35 @@ const follower_1 = __webpack_require__(/*! ./influencer/follower */ "./influence
 Object.defineProperty(exports, "Follower", ({ enumerable: true, get: function () { return follower_1.Follower; } }));
 const state_1 = __webpack_require__(/*! ./influencer/state */ "./influencer/state.ts");
 Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { return state_1.State; } }));
-const modules_1 = __webpack_require__(/*! ./modules */ "./modules.ts");
 const js_html_template_engine_1 = __webpack_require__(/*! js-html-template-engine */ "js-html-template-engine");
 const singlefin = {
-    exports: modules_1.Modules,
+    handlers: {},
+    sources: {},
+    states: {},
+    bridges: {},
+    exports: {
+        set handlers(value) {
+            singlefin.handlers[value.name] = value;
+        },
+        set sources(value) {
+            singlefin.sources[value.name] = value;
+        },
+        set states(value) {
+            singlefin.states[value.name] = value;
+        },
+        set bridges(value) {
+            singlefin.bridges[value.name] = value;
+        }
+    },
     newSession: (() => {
-        const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, modules_1.Modules.sources, modules_1.Modules.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
+        const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
         return session;
     }),
     render: ((singlefinSession, windowObject, page) => {
         const htmlTemplateEngine = new js_html_template_engine_1.HtmlTemplateEngine(windowObject);
+        for (const handler in singlefin.handlers) {
+            htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), singlefin.handlers[handler]);
+        }
         for (const component in SINGLEFIN_PAGES_COMPONENTS) {
             htmlTemplateEngine.addComponent(component, SINGLEFIN_PAGES_COMPONENTS[component]);
         }
@@ -220,50 +239,6 @@ const singlefin = {
     })
 };
 exports.singlefin = singlefin;
-
-
-/***/ }),
-
-/***/ "./modules.ts":
-/*!********************!*\
-  !*** ./modules.ts ***!
-  \********************/
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Modules = void 0;
-class Modules {
-    static set handlers(value) {
-        Modules._handlers[value.name] = value;
-    }
-    static get handlers() {
-        return Modules._handlers;
-    }
-    static set sources(value) {
-        Modules._sources[value.name] = value;
-    }
-    static get sources() {
-        return Modules._sources;
-    }
-    static set states(value) {
-        Modules._states[value.name] = value;
-    }
-    static get states() {
-        return Modules._states;
-    }
-    static set bridges(value) {
-        Modules._bridges[value.name] = value;
-    }
-    static get bridges() {
-        return Modules._bridges;
-    }
-}
-exports.Modules = Modules;
-Modules._handlers = {};
-Modules._sources = {};
-Modules._states = {};
-Modules._bridges = {};
 
 
 /***/ }),
