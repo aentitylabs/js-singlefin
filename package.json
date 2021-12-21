@@ -13,6 +13,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.2",
+    "@types/webpack-node-externals": "^2.5.3",
     "chai": "^4.2.0",
     "mocha": "^8.2.1",
     "ts-loader": "^9.2.5",
@@ -23,6 +24,8 @@
   },
   "dependencies": {
     "js-entity-store": "git+https://github.com/aentitylabs/js-entity-store.git",
-    "js-template-engine": "git+https://github.com/aentitylabs/js-template-engine"
+    "js-template-engine": "git+https://github.com/aentitylabs/js-template-engine",
+    "js-html-template-engine": "git+https://github.com/aentitylabs/js-html-template-engine",
+    "js-singlefin-deployer": "git+https://github.com/aentitylabs/js-singlefin-deployer"
   }
 }
