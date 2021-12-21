@@ -227,7 +227,7 @@ const singlefin = {
         const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
         return session;
     }),
-    render: ((singlefinSession, windowObject, page) => {
+    render: ((singlefinSession, windowObject, page, state) => {
         const htmlTemplateEngine = new js_html_template_engine_1.HtmlTemplateEngine(windowObject);
         for (const handler in singlefin.handlers) {
             htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), singlefin.handlers[handler]);
@@ -235,7 +235,7 @@ const singlefin = {
         for (const component in SINGLEFIN_PAGES_COMPONENTS) {
             htmlTemplateEngine.addComponent(component, SINGLEFIN_PAGES_COMPONENTS[component]);
         }
-        return htmlTemplateEngine.render(SINGLEFIN_PAGES[page], "server", singlefinSession.model);
+        return htmlTemplateEngine.render(SINGLEFIN_PAGES[page], state, singlefinSession.model);
     })
 };
 exports.singlefin = singlefin;

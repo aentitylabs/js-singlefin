@@ -35,7 +35,7 @@ const singlefin: any = {
     
         return session;
     }),
-    render: ((singlefinSession: SinglefinSession, windowObject: any, page: string) => {
+    render: ((singlefinSession: SinglefinSession, windowObject: any, page: string, state?: string) => {
         const htmlTemplateEngine = new HtmlTemplateEngine(windowObject);
 
         for(const handler in singlefin.handlers) {
@@ -46,7 +46,7 @@ const singlefin: any = {
             htmlTemplateEngine.addComponent(component, SINGLEFIN_PAGES_COMPONENTS[component]);
         }
     
-        return htmlTemplateEngine.render(SINGLEFIN_PAGES[page], "server", singlefinSession.model);
+        return htmlTemplateEngine.render(SINGLEFIN_PAGES[page], state, singlefinSession.model);
     })
 };
 
