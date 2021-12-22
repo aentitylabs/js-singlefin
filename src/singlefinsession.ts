@@ -34,6 +34,10 @@ export class SinglefinSession extends Influencer {
         return this._model;
     }
 
+    public addBridge(bridgeName: string, bridge: Bridge) {
+        this._entityStore.addBridge(bridgeName, bridge);
+    }
+
     public addSource(entityName: string, source: Source) {
         this._entityStore.addSource(entityName, source);
     }
@@ -51,7 +55,7 @@ export class SinglefinSession extends Influencer {
         this._entityStore.sync();
     }
 
-    public informTo(bridge: Bridge, trend: string) {
+    public informTo(bridge: string, trend: string) {
         const followers = this._trends[trend];
 
         this._currentTrend.trend = trend;
@@ -66,7 +70,7 @@ export class SinglefinSession extends Influencer {
         });
     }
 
-    public informFrom(bridge: Bridge, actions: any) {
+    public informFrom(bridge: string, actions: any) {
         this._entityStore.syncFrom(bridge, actions, () => {
             this.init(this._currentTrend.trends);
 

@@ -31,8 +31,9 @@ const singlefin: any = {
             singlefin.bridges[value.name] = value;
         }
     },
+    registry: {},
     newSession: (() => {
-        const session = Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
+        const session = Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
     
         return session;
     }),

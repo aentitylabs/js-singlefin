@@ -290,6 +290,8 @@ describe('Broker', () => {
         serverSession.addSource("User", source);
         clientSession.addSource("User", source);
 
+        clientSession.addBridge("MockBridge", bridge);
+
         serverSession.loadModel({
             "entity": "App",
             "ref": false,
@@ -419,10 +421,10 @@ describe('Broker', () => {
         });
 
         bridge.onReceived((actions: any) => {
-            serverSession.informFrom(bridge, actions);
+            serverSession.informFrom("MockBridge", actions);
         });
 
-        clientSession.informTo(bridge, "open app").then(() => {
+        clientSession.informTo("MockBridge", "open app").then(() => {
             expect({
                 "followers": {
                     "App": {
@@ -456,7 +458,7 @@ describe('Broker', () => {
                 "password": ""
             };
     
-            clientSession.informTo(bridge, "login").then(() => {
+            clientSession.informTo("MockBridge", "login").then(() => {
                 expect({
                     "followers": {
                         "App": {
@@ -479,7 +481,7 @@ describe('Broker', () => {
                     }
                 }).to.eql(clientSession.serialize());
         
-                clientSession.informTo(bridge, "access to homepage").then(() => {
+                clientSession.informTo("MockBridge", "access to homepage").then(() => {
                     expect({
                         "followers": {
                             "App": {

@@ -224,8 +224,9 @@ const singlefin = {
             singlefin.bridges[value.name] = value;
         }
     },
+    registry: {},
     newSession: (() => {
-        const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
+        const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
         return session;
     }),
     render: ((singlefinSession, windowObject, page, state, eventDelegate) => {
@@ -257,9 +258,12 @@ exports.Singlefin = void 0;
 const singlefinsession_1 = __webpack_require__(/*! ./singlefinsession */ "./singlefinsession.ts");
 const main_1 = __webpack_require__(/*! ./main */ "./main.ts");
 class Singlefin {
-    static newSession(name, sources, states, model, trends) {
+    static newSession(name, bridges, sources, states, model, trends) {
         const session = new singlefinsession_1.SinglefinSession();
         session.loadModel(model);
+        for (const bridge in bridges) {
+            session.addBridge(bridges[bridge].name, new bridges[bridge]());
+        }
         for (const source in sources) {
             session.addSource(sources[source].name, new sources[source]());
         }
@@ -354,6 +358,9 @@ class SinglefinSession extends influencer_1.Influencer {
     }
     get model() {
         return this._model;
+    }
+    addBridge(bridgeName, bridge) {
+        this._entityStore.addBridge(bridgeName, bridge);
     }
     addSource(entityName, source) {
         this._entityStore.addSource(entityName, source);
