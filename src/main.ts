@@ -3,6 +3,7 @@ import { SinglefinSession } from "./singlefinsession";
 import { Follower } from "./influencer/follower";
 import { State } from "./influencer/state";
 import { HtmlTemplateEngine } from "js-html-template-engine";
+import { SinglefinHtmlTemplateEngineHandler } from "./singlefinhtmltemplateenginehandler";
 
 declare const SINGLEFIN_APP_NAME: string;
 declare const SINGLEFIN_TRENDS: any;
@@ -35,8 +36,10 @@ const singlefin: any = {
     
         return session;
     }),
-    render: ((singlefinSession: SinglefinSession, windowObject: any, page: string, state?: string) => {
+    render: ((singlefinSession: SinglefinSession, windowObject: any, page: string, state?: string, eventDelegate?: any) => {
         const htmlTemplateEngine = new HtmlTemplateEngine(windowObject);
+
+        htmlTemplateEngine.htmlTemplateEngineHandler = new SinglefinHtmlTemplateEngineHandler(eventDelegate);
 
         for(const handler in singlefin.handlers) {
             htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), singlefin.handlers[handler]);

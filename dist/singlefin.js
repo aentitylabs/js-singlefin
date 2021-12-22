@@ -204,6 +204,7 @@ Object.defineProperty(exports, "Follower", ({ enumerable: true, get: function ()
 const state_1 = __webpack_require__(/*! ./influencer/state */ "./influencer/state.ts");
 Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { return state_1.State; } }));
 const js_html_template_engine_1 = __webpack_require__(/*! js-html-template-engine */ "js-html-template-engine");
+const singlefinhtmltemplateenginehandler_1 = __webpack_require__(/*! ./singlefinhtmltemplateenginehandler */ "./singlefinhtmltemplateenginehandler.ts");
 const singlefin = {
     handlers: {},
     sources: {},
@@ -227,8 +228,9 @@ const singlefin = {
         const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
         return session;
     }),
-    render: ((singlefinSession, windowObject, page, state) => {
+    render: ((singlefinSession, windowObject, page, state, eventDelegate) => {
         const htmlTemplateEngine = new js_html_template_engine_1.HtmlTemplateEngine(windowObject);
+        htmlTemplateEngine.htmlTemplateEngineHandler = new singlefinhtmltemplateenginehandler_1.SinglefinHtmlTemplateEngineHandler(eventDelegate);
         for (const handler in singlefin.handlers) {
             htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), singlefin.handlers[handler]);
         }
@@ -288,6 +290,31 @@ class Singlefin {
     }
 }
 exports.Singlefin = Singlefin;
+
+
+/***/ }),
+
+/***/ "./singlefinhtmltemplateenginehandler.ts":
+/*!***********************************************!*\
+  !*** ./singlefinhtmltemplateenginehandler.ts ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SinglefinHtmlTemplateEngineHandler = void 0;
+class SinglefinHtmlTemplateEngineHandler {
+    constructor(callback) {
+        this._callback = callback;
+    }
+    onChangeState(state) {
+        if (!this._callback) {
+            return;
+        }
+        this._callback(state);
+    }
+}
+exports.SinglefinHtmlTemplateEngineHandler = SinglefinHtmlTemplateEngineHandler;
 
 
 /***/ }),
