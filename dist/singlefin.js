@@ -231,7 +231,7 @@ const singlefin = {
             singlefin.bridges[value.name] = value;
         }
     },
-    registry: {},
+    registry: SINGLEFIN_REGISTRY,
     start: (() => {
         for (const service in singlefin.services) {
             singlefin._serviceInstances[service] = new singlefin.services[service]();

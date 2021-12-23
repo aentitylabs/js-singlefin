@@ -7,6 +7,7 @@ import { SinglefinHtmlTemplateEngineHandler } from "./singlefinhtmltemplateengin
 import { Service } from "./service";
 
 declare const SINGLEFIN_APP_NAME: string;
+declare const SINGLEFIN_REGISTRY: any;
 declare const SINGLEFIN_TRENDS: any;
 declare const SINGLEFIN_MODEL: any;
 declare const SINGLEFIN_PAGES: any;
@@ -37,7 +38,7 @@ const singlefin: any = {
             singlefin.bridges[value.name] = value;
         }
     },
-    registry: {},
+    registry: SINGLEFIN_REGISTRY,
     start: (() => {
         for(const service in singlefin.services) {
             singlefin._serviceInstances[service] = new singlefin.services[service]();
