@@ -6,6 +6,7 @@ export class SinglefinSession extends Influencer {
     private _entityStore: EntityStore = new EntityStore();
     private _model: any;
     private _currentTrend: any;
+    private _data: any;
 
     public constructor() {
         super();
@@ -24,6 +25,14 @@ export class SinglefinSession extends Influencer {
         });
 
         this._entityStore.addSource("Singlefin", new SinglefinSource());
+    }
+
+    public set data(value: any) {
+        this._data = value;
+    }
+
+    public get data() {
+        return this._data;
     }
 
     public loadModel(model: any) {

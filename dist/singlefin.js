@@ -206,6 +206,8 @@ Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { 
 const js_html_template_engine_1 = __webpack_require__(/*! js-html-template-engine */ "js-html-template-engine");
 const singlefinhtmltemplateenginehandler_1 = __webpack_require__(/*! ./singlefinhtmltemplateenginehandler */ "./singlefinhtmltemplateenginehandler.ts");
 const singlefin = {
+    _serviceInstances: {},
+    services: {},
     handlers: {},
     sources: {},
     states: {},
@@ -225,8 +227,14 @@ const singlefin = {
         }
     },
     registry: {},
-    newSession: (() => {
-        const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
+    start: (() => {
+        for (const service in singlefin.services) {
+            singlefin._serviceInstances[service] = new singlefin.services[service]();
+            singlefin._serviceInstances[service].run();
+        }
+    }),
+    newSession: ((data = {}) => {
+        const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS, data);
         return session;
     }),
     render: ((singlefinSession, windowObject, page, state, eventDelegate) => {
@@ -258,14 +266,14 @@ exports.Singlefin = void 0;
 const singlefinsession_1 = __webpack_require__(/*! ./singlefinsession */ "./singlefinsession.ts");
 const main_1 = __webpack_require__(/*! ./main */ "./main.ts");
 class Singlefin {
-    static newSession(name, bridges, sources, states, model, trends) {
+    static newSession(name, bridges, sources, states, model, trends, data) {
         const session = new singlefinsession_1.SinglefinSession();
         session.loadModel(model);
         for (const bridge in bridges) {
-            session.addBridge(bridges[bridge].name, new bridges[bridge]());
+            session.addBridge(bridges[bridge].name, new bridges[bridge](data));
         }
         for (const source in sources) {
-            session.addSource(sources[source].name, new sources[source]());
+            session.addSource(sources[source].name, new sources[source](data));
         }
         const app = new main_1.Follower(name);
         app.subscribe(session);
@@ -352,6 +360,12 @@ class SinglefinSession extends influencer_1.Influencer {
             }
         });
         this._entityStore.addSource("Singlefin", new singlefinsource_1.SinglefinSource());
+    }
+    set data(value) {
+        this._data = value;
+    }
+    get data() {
+        return this._data;
     }
     loadModel(model) {
         this._model = js_entity_store_1.EntityFactory.newEntity(this._entityStore, model);

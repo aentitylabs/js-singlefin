@@ -4,7 +4,10 @@ export declare class SinglefinSession extends Influencer {
     private _entityStore;
     private _model;
     private _currentTrend;
+    private _data;
     constructor();
+    set data(value: any);
+    get data(): any;
     loadModel(model: any): void;
     get model(): any;
     addBridge(bridgeName: string, bridge: Bridge): void;

@@ -13,6 +13,8 @@ declare const SINGLEFIN_PAGES_COMPONENTS: any;
 
 
 const singlefin: any = {
+    _serviceInstances: {},
+    services: {},
     handlers: {},
     sources: {},
     states: {},
@@ -32,8 +34,15 @@ const singlefin: any = {
         }
     },
     registry: {},
-    newSession: (() => {
-        const session = Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS);
+    start: (() => {
+        for(const service in singlefin.services) {
+            singlefin._serviceInstances[service] = new singlefin.services[service]();
+
+            singlefin._serviceInstances[service].run();
+        }
+    }),
+    newSession: ((data: any = {}) => {
+        const session = Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS, data);
     
         return session;
     }),
