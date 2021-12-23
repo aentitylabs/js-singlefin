@@ -4,6 +4,7 @@ import { Follower } from "./influencer/follower";
 import { State } from "./influencer/state";
 import { HtmlTemplateEngine } from "js-html-template-engine";
 import { SinglefinHtmlTemplateEngineHandler } from "./singlefinhtmltemplateenginehandler";
+import { Service } from "./service";
 
 declare const SINGLEFIN_APP_NAME: string;
 declare const SINGLEFIN_TRENDS: any;
@@ -63,4 +64,4 @@ const singlefin: any = {
     })
 };
 
-export { Singlefin, SinglefinSession, Follower, State, singlefin }
+export { Singlefin, SinglefinSession, Service, Follower, State, singlefin }

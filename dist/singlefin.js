@@ -194,7 +194,7 @@ exports.State = State;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.singlefin = exports.State = exports.Follower = exports.SinglefinSession = exports.Singlefin = void 0;
+exports.singlefin = exports.State = exports.Follower = exports.Service = exports.SinglefinSession = exports.Singlefin = void 0;
 const singlefin_1 = __webpack_require__(/*! ./singlefin */ "./singlefin.ts");
 Object.defineProperty(exports, "Singlefin", ({ enumerable: true, get: function () { return singlefin_1.Singlefin; } }));
 const singlefinsession_1 = __webpack_require__(/*! ./singlefinsession */ "./singlefinsession.ts");
@@ -205,6 +205,8 @@ const state_1 = __webpack_require__(/*! ./influencer/state */ "./influencer/stat
 Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { return state_1.State; } }));
 const js_html_template_engine_1 = __webpack_require__(/*! js-html-template-engine */ "js-html-template-engine");
 const singlefinhtmltemplateenginehandler_1 = __webpack_require__(/*! ./singlefinhtmltemplateenginehandler */ "./singlefinhtmltemplateenginehandler.ts");
+const service_1 = __webpack_require__(/*! ./service */ "./service.ts");
+Object.defineProperty(exports, "Service", ({ enumerable: true, get: function () { return service_1.Service; } }));
 const singlefin = {
     _serviceInstances: {},
     services: {},
@@ -250,6 +252,22 @@ const singlefin = {
     })
 };
 exports.singlefin = singlefin;
+
+
+/***/ }),
+
+/***/ "./service.ts":
+/*!********************!*\
+  !*** ./service.ts ***!
+  \********************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Service = void 0;
+class Service {
+}
+exports.Service = Service;
 
 
 /***/ }),
