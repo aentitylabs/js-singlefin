@@ -21,6 +21,9 @@ const singlefin: any = {
     states: {},
     bridges: {},
     exports: {
+        set services(value: any) {
+            singlefin.services[value.name] = value;
+        },
         set handlers(value: any) {
             singlefin.handlers[value.name] = value;
         },

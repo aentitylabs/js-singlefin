@@ -215,6 +215,9 @@ const singlefin = {
     states: {},
     bridges: {},
     exports: {
+        set services(value) {
+            singlefin.services[value.name] = value;
+        },
         set handlers(value) {
             singlefin.handlers[value.name] = value;
         },
