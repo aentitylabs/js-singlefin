@@ -12,8 +12,8 @@ export declare class SinglefinSession extends Influencer {
     get model(): any;
     addBridge(bridgeName: string, bridge: Bridge): void;
     addSource(entityName: string, source: Source): void;
-    inform(trend: string): void;
+    inform(trend: string): Promise<void>;
     informTo(bridge: string, trend: string): Promise<void>;
-    informFrom(bridge: string, actions: any): void;
+    informFrom(bridge: string, actions: any): Promise<void>;
     private serializeFollowers;
 }

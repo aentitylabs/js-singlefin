@@ -51,43 +51,55 @@ export class SinglefinSession extends Influencer {
         this._entityStore.addSource(entityName, source);
     }
 
-    public inform(trend: string) {
-        const followers = this._trends[trend];
+    public inform(trend: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const followers = this._trends[trend];
 
-        this._currentTrend.trend = trend;
-        this._currentTrend.trends[trend] = this.serializeFollowers(followers);
+            this._currentTrend.trend = trend;
+            this._currentTrend.trends[trend] = this.serializeFollowers(followers);
 
-        this._entityStore.sync();
+            this._entityStore.sync(() => {
+                this.newTrend(trend, this._model);
 
-        this.newTrend(trend, this._model);
-
-        this._entityStore.sync();
-    }
-
-    public informTo(bridge: string, trend: string) {
-        const followers = this._trends[trend];
-
-        this._currentTrend.trend = trend;
-        this._currentTrend.trends[trend] = this.serializeFollowers(followers);
-
-        return this._entityStore.syncTo(bridge).then(() => {
-            this.init(this._currentTrend.trends);
-
-            this.newTrend(this._currentTrend.trend, this._model);
-
-            return this._entityStore.syncTo(bridge);
+                this._entityStore.sync(() => {
+                    resolve();
+                });
+            });
         });
     }
 
-    public informFrom(bridge: string, actions: any) {
-        this._entityStore.syncFrom(bridge, actions, () => {
-            this.init(this._currentTrend.trends);
+    public informTo(bridge: string, trend: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const followers = this._trends[trend];
 
-            this.newTrend(this._currentTrend.trend, this._model);
+            this._currentTrend.trend = trend;
+            this._currentTrend.trends[trend] = this.serializeFollowers(followers);
+    
+            this._entityStore.syncTo(bridge, () => {
+                this.init(this._currentTrend.trends);
+    
+                this.newTrend(this._currentTrend.trend, this._model);
+    
+                this._entityStore.syncTo(bridge, () => {
+                    resolve();
+                });
+            });
+        });
+    }
 
-            const followers = this._trends[this._currentTrend.trend];
+    public informFrom(bridge: string, actions: any): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this._entityStore.syncFrom(bridge, actions, () => {
+                this.init(this._currentTrend.trends);
 
-            this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+                this.newTrend(this._currentTrend.trend, this._model);
+
+                const followers = this._trends[this._currentTrend.trend];
+
+                this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+
+                resolve();
+            });
         });
     }
 
