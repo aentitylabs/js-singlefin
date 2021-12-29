@@ -463,13 +463,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SinglefinSource = void 0;
 const js_entity_store_1 = __webpack_require__(/*! js-entity-store */ "js-entity-store");
 class SinglefinSource extends js_entity_store_1.Source {
-    load(entity) {
-        return entity;
+    load(entity, onLoad) {
+        onLoad(entity);
     }
-    update(entity) {
-        return entity;
+    update(entity, onUpdate) {
+        onUpdate(entity);
     }
-    delete(entity) {
+    delete(entity, onDelete) {
+        onDelete();
     }
 }
 exports.SinglefinSource = SinglefinSource;
