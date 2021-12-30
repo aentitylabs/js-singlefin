@@ -289,13 +289,13 @@ const main_1 = __webpack_require__(/*! ./main */ "./main.ts");
 class Singlefin {
     static newSession(name, bridges, sources, states, model, trends, data) {
         const session = new singlefinsession_1.SinglefinSession();
-        session.loadModel(model);
         for (const bridge in bridges) {
             session.addBridge(bridges[bridge].name, new bridges[bridge](data));
         }
         for (const source in sources) {
             session.addSource(sources[source].name, new sources[source](data));
         }
+        session.loadModel(model);
         const app = new main_1.Follower(name);
         app.subscribe(session);
         for (const state in states) {
@@ -434,10 +434,6 @@ class SinglefinSession extends influencer_1.Influencer {
                 this.newTrend(this._currentTrend.trend, this._model);
                 const followers = this._trends[this._currentTrend.trend];
                 this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
-            }, () => {
-                this._entityStore.sync(() => {
-                    resolve();
-                });
             });
         });
     }
