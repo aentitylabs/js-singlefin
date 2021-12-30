@@ -98,7 +98,9 @@ export class SinglefinSession extends Influencer {
 
                 this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
             }, () => {
-                resolve();
+                this._entityStore.sync(() => {
+                    resolve();
+                });
             });
         });
     }
