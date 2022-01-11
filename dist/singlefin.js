@@ -340,11 +340,11 @@ class SinglefinHtmlTemplateEngineHandler {
     constructor(callback) {
         this._callback = callback;
     }
-    onChangeState(state) {
+    onChangeLayout(layout) {
         if (!this._callback) {
             return;
         }
-        this._callback(state);
+        this._callback(layout);
     }
 }
 exports.SinglefinHtmlTemplateEngineHandler = SinglefinHtmlTemplateEngineHandler;

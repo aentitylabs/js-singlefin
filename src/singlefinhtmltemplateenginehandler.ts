@@ -9,11 +9,11 @@ export class SinglefinHtmlTemplateEngineHandler implements HtmlTemplateEngineHan
         this._callback = callback;
     }
 
-    public onChangeState(state: string): void {
+    public onChangeLayout(layout: string): void {
         if(!this._callback) {
             return;
         }
 
-        this._callback(state);
+        this._callback(layout);
     }
 }
