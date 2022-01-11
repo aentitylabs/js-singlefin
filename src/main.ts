@@ -47,24 +47,9 @@ const singlefin: any = {
         }
     }),
     newSession: ((data: any = {}) => {
-        const session = Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS, data);
+        const session = Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS, SINGLEFIN_PAGES, SINGLEFIN_PAGES_COMPONENTS, singlefin.handlers, data);
     
         return session;
-    }),
-    render: ((singlefinSession: SinglefinSession, windowObject: any, page: string, state?: string, eventDelegate?: any) => {
-        const htmlTemplateEngine = new HtmlTemplateEngine(windowObject);
-
-        htmlTemplateEngine.htmlTemplateEngineHandler = new SinglefinHtmlTemplateEngineHandler(eventDelegate);
-
-        for(const handler in singlefin.handlers) {
-            htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), singlefin.handlers[handler]);
-        }
-    
-        for(const component in SINGLEFIN_PAGES_COMPONENTS) {
-            htmlTemplateEngine.addComponent(component, SINGLEFIN_PAGES_COMPONENTS[component]);
-        }
-    
-        return htmlTemplateEngine.render(SINGLEFIN_PAGES[page], state, singlefinSession.model);
     })
 };
 

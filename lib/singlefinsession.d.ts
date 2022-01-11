@@ -2,10 +2,13 @@ import { Bridge, Source } from "js-entity-store";
 import { Influencer } from "./influencer/influencer";
 export declare class SinglefinSession extends Influencer {
     private _entityStore;
+    private _pages;
+    private _pagesComponents;
+    private _handlers;
     private _model;
     private _currentTrend;
     private _data;
-    constructor();
+    constructor(pages?: any, pagesComponents?: any, handlers?: any);
     set data(value: any);
     get data(): any;
     loadModel(model: any): void;
@@ -15,5 +18,6 @@ export declare class SinglefinSession extends Influencer {
     inform(trend: string): Promise<void>;
     informTo(bridge: string, trend: string): Promise<void>;
     informFrom(bridge: string, actions: any): Promise<void>;
+    render(bridge: string, trend: string, windowObject: any, page: string, layout?: string): Promise<void>;
     private serializeFollowers;
 }

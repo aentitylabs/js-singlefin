@@ -203,8 +203,6 @@ const follower_1 = __webpack_require__(/*! ./influencer/follower */ "./influence
 Object.defineProperty(exports, "Follower", ({ enumerable: true, get: function () { return follower_1.Follower; } }));
 const state_1 = __webpack_require__(/*! ./influencer/state */ "./influencer/state.ts");
 Object.defineProperty(exports, "State", ({ enumerable: true, get: function () { return state_1.State; } }));
-const js_html_template_engine_1 = __webpack_require__(/*! js-html-template-engine */ "js-html-template-engine");
-const singlefinhtmltemplateenginehandler_1 = __webpack_require__(/*! ./singlefinhtmltemplateenginehandler */ "./singlefinhtmltemplateenginehandler.ts");
 const service_1 = __webpack_require__(/*! ./service */ "./service.ts");
 Object.defineProperty(exports, "Service", ({ enumerable: true, get: function () { return service_1.Service; } }));
 const singlefin = {
@@ -239,19 +237,8 @@ const singlefin = {
         }
     }),
     newSession: ((data = {}) => {
-        const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS, data);
+        const session = singlefin_1.Singlefin.newSession(SINGLEFIN_APP_NAME, singlefin.bridges, singlefin.sources, singlefin.states, SINGLEFIN_MODEL, SINGLEFIN_TRENDS, SINGLEFIN_PAGES, SINGLEFIN_PAGES_COMPONENTS, singlefin.handlers, data);
         return session;
-    }),
-    render: ((singlefinSession, windowObject, page, state, eventDelegate) => {
-        const htmlTemplateEngine = new js_html_template_engine_1.HtmlTemplateEngine(windowObject);
-        htmlTemplateEngine.htmlTemplateEngineHandler = new singlefinhtmltemplateenginehandler_1.SinglefinHtmlTemplateEngineHandler(eventDelegate);
-        for (const handler in singlefin.handlers) {
-            htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), singlefin.handlers[handler]);
-        }
-        for (const component in SINGLEFIN_PAGES_COMPONENTS) {
-            htmlTemplateEngine.addComponent(component, SINGLEFIN_PAGES_COMPONENTS[component]);
-        }
-        return htmlTemplateEngine.render(SINGLEFIN_PAGES[page], state, singlefinSession.model);
     })
 };
 exports.singlefin = singlefin;
@@ -287,8 +274,8 @@ exports.Singlefin = void 0;
 const singlefinsession_1 = __webpack_require__(/*! ./singlefinsession */ "./singlefinsession.ts");
 const main_1 = __webpack_require__(/*! ./main */ "./main.ts");
 class Singlefin {
-    static newSession(name, bridges, sources, states, model, trends, data) {
-        const session = new singlefinsession_1.SinglefinSession();
+    static newSession(name, bridges, sources, states, model, trends, pages, pagesComponents, handlers, data) {
+        const session = new singlefinsession_1.SinglefinSession(pages, pagesComponents, handlers);
         for (const bridge in bridges) {
             session.addBridge(bridges[bridge].name, new bridges[bridge](data));
         }
@@ -362,12 +349,17 @@ exports.SinglefinHtmlTemplateEngineHandler = SinglefinHtmlTemplateEngineHandler;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SinglefinSession = void 0;
 const js_entity_store_1 = __webpack_require__(/*! js-entity-store */ "js-entity-store");
+const js_html_template_engine_1 = __webpack_require__(/*! js-html-template-engine */ "js-html-template-engine");
 const influencer_1 = __webpack_require__(/*! ./influencer/influencer */ "./influencer/influencer.ts");
+const singlefinhtmltemplateenginehandler_1 = __webpack_require__(/*! ./singlefinhtmltemplateenginehandler */ "./singlefinhtmltemplateenginehandler.ts");
 const singlefinsource_1 = __webpack_require__(/*! ./singlefinsource */ "./singlefinsource.ts");
 class SinglefinSession extends influencer_1.Influencer {
-    constructor() {
+    constructor(pages, pagesComponents, handlers) {
         super();
         this._entityStore = new js_entity_store_1.EntityStore();
+        this._pages = pages;
+        this._pagesComponents = pagesComponents;
+        this._handlers = handlers;
         this._currentTrend = js_entity_store_1.EntityFactory.newEntity(this._entityStore, {
             "entity": "Singlefin",
             "ref": false,
@@ -434,6 +426,32 @@ class SinglefinSession extends influencer_1.Influencer {
                 this.newTrend(this._currentTrend.trend, this._model);
                 const followers = this._trends[this._currentTrend.trend];
                 this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+            });
+        });
+    }
+    render(bridge, trend, windowObject, page, layout) {
+        return new Promise((resolve, reject) => {
+            this.informTo(bridge, trend).then(() => {
+                const htmlTemplateEngine = new js_html_template_engine_1.HtmlTemplateEngine(windowObject);
+                htmlTemplateEngine.htmlTemplateEngineHandler = new singlefinhtmltemplateenginehandler_1.SinglefinHtmlTemplateEngineHandler((layout, data) => {
+                    if (data && data.trend) {
+                        this.informTo(bridge, data.trend).then(() => {
+                        }).catch((errorStatus) => {
+                            console.log("inform error: " + errorStatus);
+                        });
+                    }
+                });
+                for (const handler in this._handlers) {
+                    htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), this._handlers[handler]);
+                }
+                for (const component in this._pagesComponents) {
+                    htmlTemplateEngine.addComponent(component, this._pagesComponents[component]);
+                }
+                htmlTemplateEngine.render(this._pages[page], layout, this.model);
+                resolve();
+            }).catch((errorStatus) => {
+                console.log("render error: " + errorStatus);
+                reject();
             });
         });
     }

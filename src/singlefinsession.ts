@@ -1,15 +1,24 @@
 import { Bridge, EntityFactory, EntityStore, Source } from "js-entity-store";
+import { HtmlTemplateEngine } from "js-html-template-engine";
 import { Influencer } from "./influencer/influencer";
+import { SinglefinHtmlTemplateEngineHandler } from "./singlefinhtmltemplateenginehandler";
 import { SinglefinSource } from "./singlefinsource";
 
 export class SinglefinSession extends Influencer {
     private _entityStore: EntityStore = new EntityStore();
+    private _pages: any;
+    private _pagesComponents: any;
+    private _handlers: any;
     private _model: any;
     private _currentTrend: any;
     private _data: any;
 
-    public constructor() {
+    public constructor(pages?: any, pagesComponents?: any, handlers?: any) {
         super();
+
+        this._pages = pages;
+        this._pagesComponents = pagesComponents;
+        this._handlers = handlers;
 
         this._currentTrend = EntityFactory.newEntity(this._entityStore, {
             "entity": "Singlefin",
@@ -97,6 +106,40 @@ export class SinglefinSession extends Influencer {
                 const followers = this._trends[this._currentTrend.trend];
 
                 this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+            });
+        });
+    }
+
+    public render(bridge: string, trend: string, windowObject: any, page: string, layout?: string) {
+        return new Promise<void>((resolve, reject) => {
+            this.informTo(bridge, trend).then(() => {
+                const htmlTemplateEngine = new HtmlTemplateEngine(windowObject);
+    
+                htmlTemplateEngine.htmlTemplateEngineHandler = new SinglefinHtmlTemplateEngineHandler((layout: string, data: any) => {
+                    if(data && data.trend) {
+                        this.informTo(bridge, data.trend).then(() => {
+                        
+                        }).catch((errorStatus: any) => {
+                            console.log("inform error: " + errorStatus)
+                        });
+                    }
+                });
+        
+                for(const handler in this._handlers) {
+                    htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), this._handlers[handler]);
+                }
+            
+                for(const component in this._pagesComponents) {
+                    htmlTemplateEngine.addComponent(component, this._pagesComponents[component]);
+                }
+            
+                htmlTemplateEngine.render(this._pages[page], layout, this.model);
+
+                resolve();
+            }).catch((errorStatus: any) => {
+                console.log("render error: " + errorStatus);
+
+                reject();
             });
         });
     }

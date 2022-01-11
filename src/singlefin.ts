@@ -3,8 +3,8 @@ import { Follower } from "./main";
 
 
 export class Singlefin {
-    public static newSession(name: string, bridges: any, sources: any, states: any, model: any, trends: any, data: any) {
-        const session = new SinglefinSession();
+    public static newSession(name: string, bridges: any, sources: any, states: any, model: any, trends: any, pages: any, pagesComponents: any, handlers: any, data: any) {
+        const session = new SinglefinSession(pages, pagesComponents, handlers);
 
         for(const bridge in bridges) {
             session.addBridge(bridges[bridge].name, new bridges[bridge](data));
