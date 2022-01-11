@@ -110,38 +110,28 @@ export class SinglefinSession extends Influencer {
         });
     }
 
-    public render(bridge: string, trend: string, windowObject: any, page: string, layout?: string) {
-        return new Promise<void>((resolve, reject) => {
-            this.informTo(bridge, trend).then(() => {
-                const htmlTemplateEngine = new HtmlTemplateEngine(windowObject);
+    public render(windowObject: any, page: string, layout?: string, bridge?: string) {
+        const htmlTemplateEngine = new HtmlTemplateEngine(windowObject);
     
-                htmlTemplateEngine.htmlTemplateEngineHandler = new SinglefinHtmlTemplateEngineHandler((layout: string, data: any) => {
-                    if(data && data.trend) {
-                        this.informTo(bridge, data.trend).then(() => {
-                        
-                        }).catch((errorStatus: any) => {
-                            console.log("inform error: " + errorStatus)
-                        });
-                    }
+        htmlTemplateEngine.htmlTemplateEngineHandler = new SinglefinHtmlTemplateEngineHandler((layout: string, data: any) => {
+            if(bridge && data && data.trend) {
+                this.informTo(bridge, data.trend).then(() => {
+                
+                }).catch((errorStatus: any) => {
+                    console.log("inform error: " + errorStatus)
                 });
-        
-                for(const handler in this._handlers) {
-                    htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), this._handlers[handler]);
-                }
-            
-                for(const component in this._pagesComponents) {
-                    htmlTemplateEngine.addComponent(component, this._pagesComponents[component]);
-                }
-            
-                htmlTemplateEngine.render(this._pages[page], layout, this.model);
-
-                resolve();
-            }).catch((errorStatus: any) => {
-                console.log("render error: " + errorStatus);
-
-                reject();
-            });
+            }
         });
+
+        for(const handler in this._handlers) {
+            htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), this._handlers[handler]);
+        }
+    
+        for(const component in this._pagesComponents) {
+            htmlTemplateEngine.addComponent(component, this._pagesComponents[component]);
+        }
+    
+        htmlTemplateEngine.render(this._pages[page], layout, this.model);
     }
 
     private serializeFollowers(followers: any[]) {

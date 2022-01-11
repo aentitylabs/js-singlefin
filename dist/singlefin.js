@@ -429,31 +429,23 @@ class SinglefinSession extends influencer_1.Influencer {
             });
         });
     }
-    render(bridge, trend, windowObject, page, layout) {
-        return new Promise((resolve, reject) => {
-            this.informTo(bridge, trend).then(() => {
-                const htmlTemplateEngine = new js_html_template_engine_1.HtmlTemplateEngine(windowObject);
-                htmlTemplateEngine.htmlTemplateEngineHandler = new singlefinhtmltemplateenginehandler_1.SinglefinHtmlTemplateEngineHandler((layout, data) => {
-                    if (data && data.trend) {
-                        this.informTo(bridge, data.trend).then(() => {
-                        }).catch((errorStatus) => {
-                            console.log("inform error: " + errorStatus);
-                        });
-                    }
+    render(windowObject, page, layout, bridge) {
+        const htmlTemplateEngine = new js_html_template_engine_1.HtmlTemplateEngine(windowObject);
+        htmlTemplateEngine.htmlTemplateEngineHandler = new singlefinhtmltemplateenginehandler_1.SinglefinHtmlTemplateEngineHandler((layout, data) => {
+            if (bridge && data && data.trend) {
+                this.informTo(bridge, data.trend).then(() => {
+                }).catch((errorStatus) => {
+                    console.log("inform error: " + errorStatus);
                 });
-                for (const handler in this._handlers) {
-                    htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), this._handlers[handler]);
-                }
-                for (const component in this._pagesComponents) {
-                    htmlTemplateEngine.addComponent(component, this._pagesComponents[component]);
-                }
-                htmlTemplateEngine.render(this._pages[page], layout, this.model);
-                resolve();
-            }).catch((errorStatus) => {
-                console.log("render error: " + errorStatus);
-                reject();
-            });
+            }
         });
+        for (const handler in this._handlers) {
+            htmlTemplateEngine.addComponentHandler(handler.toLowerCase(), this._handlers[handler]);
+        }
+        for (const component in this._pagesComponents) {
+            htmlTemplateEngine.addComponent(component, this._pagesComponents[component]);
+        }
+        htmlTemplateEngine.render(this._pages[page], layout, this.model);
     }
     serializeFollowers(followers) {
         const serializedFollowers = [];

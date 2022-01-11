@@ -18,6 +18,6 @@ export declare class SinglefinSession extends Influencer {
     inform(trend: string): Promise<void>;
     informTo(bridge: string, trend: string): Promise<void>;
     informFrom(bridge: string, actions: any): Promise<void>;
-    render(bridge: string, trend: string, windowObject: any, page: string, layout?: string): Promise<void>;
+    render(windowObject: any, page: string, layout?: string, bridge?: string): void;
     private serializeFollowers;
 }
