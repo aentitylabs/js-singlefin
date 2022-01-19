@@ -427,7 +427,11 @@ class SinglefinSession extends influencer_1.Influencer {
                 this.init(this._currentTrend.trends);
                 this.newTrend(this._currentTrend.trend, this._model);
                 const followers = this._trends[this._currentTrend.trend];
+                if (!followers) {
+                    return resolve;
+                }
                 this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+                resolve();
             });
         });
     }

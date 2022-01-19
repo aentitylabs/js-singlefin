@@ -108,7 +108,13 @@ export class SinglefinSession extends Influencer {
 
                 const followers = this._trends[this._currentTrend.trend];
 
+                if(!followers) {
+                    return resolve;
+                }
+
                 this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+
+                resolve();
             });
         });
     }
