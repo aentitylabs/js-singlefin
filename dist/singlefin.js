@@ -408,11 +408,10 @@ class SinglefinSession extends influencer_1.Influencer {
     informTo(bridge, trend) {
         return new Promise((resolve, reject) => {
             const followers = this._trends[trend];
-            if (!followers) {
-                return resolve();
-            }
             this._currentTrend.trend = trend;
-            this._currentTrend.trends[trend] = this.serializeFollowers(followers);
+            if (!followers) {
+                this._currentTrend.trends[trend] = this.serializeFollowers(followers);
+            }
             this._entityStore.syncTo(bridge, () => {
                 this.init(this._currentTrend.trends);
                 this.newTrend(this._currentTrend.trend, this._model);

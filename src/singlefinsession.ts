@@ -81,12 +81,11 @@ export class SinglefinSession extends Influencer {
         return new Promise((resolve, reject) => {
             const followers = this._trends[trend];
 
-            if(!followers) {
-                return resolve();
-            }
-
             this._currentTrend.trend = trend;
-            this._currentTrend.trends[trend] = this.serializeFollowers(followers);
+
+            if(!followers) {
+                this._currentTrend.trends[trend] = this.serializeFollowers(followers);   
+            }
     
             this._entityStore.syncTo(bridge, () => {
                 this.init(this._currentTrend.trends);
