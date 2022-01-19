@@ -83,7 +83,7 @@ export class SinglefinSession extends Influencer {
 
             this._currentTrend.trend = trend;
 
-            if(!followers) {
+            if(followers) {
                 this._currentTrend.trends[trend] = this.serializeFollowers(followers);   
             }
     
