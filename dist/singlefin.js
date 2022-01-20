@@ -431,6 +431,7 @@ class SinglefinSession extends influencer_1.Influencer {
                     return resolve;
                 }
                 this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+            }, () => {
                 resolve();
             });
         });
