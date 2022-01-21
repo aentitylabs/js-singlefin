@@ -452,6 +452,8 @@ class SinglefinSession extends influencer_1.Influencer {
         if (bridge && trend) {
             this.informTo(bridge, trend).then(() => {
                 this.renderPage(windowObject, this.context.page, pageLayout, bridge);
+            }).catch((errorStatus) => {
+                console.log("inform error: " + errorStatus);
             });
         }
         else {
