@@ -445,18 +445,22 @@ class SinglefinSession extends influencer_1.Influencer {
         });
     }
     render(windowObject, layout, bridge, trend) {
-        let pageLayout = this.context.layout;
-        if (layout) {
-            pageLayout = layout;
-        }
         if (bridge && trend) {
             this.informTo(bridge, trend).then(() => {
+                let pageLayout = this.context.layout;
+                if (layout) {
+                    pageLayout = layout;
+                }
                 this.renderPage(windowObject, this.context.page, pageLayout, bridge);
             }).catch((errorStatus) => {
                 console.log("inform error: " + errorStatus);
             });
         }
         else {
+            let pageLayout = this.context.layout;
+            if (layout) {
+                pageLayout = layout;
+            }
             this.renderPage(windowObject, this.context.page, pageLayout, bridge);
         }
     }

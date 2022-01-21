@@ -122,20 +122,26 @@ export class SinglefinSession extends Influencer {
     }
 
     public render(windowObject: any, layout?: string, bridge?: string, trend?: string) {
-        let pageLayout: string = this.context.layout;
-
-        if(layout) {
-            pageLayout = layout;
-        }
-
         if(bridge && trend) {
             this.informTo(bridge, trend).then(() => {
+                let pageLayout: string = this.context.layout;
+
+                if(layout) {
+                    pageLayout = layout;
+                }
+                
                 this.renderPage(windowObject, this.context.page, pageLayout, bridge);
             }).catch((errorStatus: any) => {
                 console.log("inform error: " + errorStatus)
             });
         }
         else {
+            let pageLayout: string = this.context.layout;
+
+            if(layout) {
+                pageLayout = layout;
+            }
+
             this.renderPage(windowObject, this.context.page, pageLayout, bridge);
         }
     }
