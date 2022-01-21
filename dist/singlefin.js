@@ -55,14 +55,14 @@ class Follower {
     changeState(state) {
         this._state = this._states[state];
     }
-    handle(trend, model) {
-        this._state.handle(this, trend, model);
+    handle(influencer, trend, model) {
+        this._state.handle(influencer, this, trend, model);
     }
-    onTrendChange(trend, model) {
+    onTrendChange(influencer, trend, model) {
         if (this._trendStates[trend]) {
             this._state = this._trendStates[trend];
         }
-        this.handle(trend, model);
+        this.handle(influencer, trend, model);
     }
     set state(state) {
         this._state = state;
@@ -97,6 +97,12 @@ class Influencer {
         this._followers = {};
         this._trends = {};
     }
+    set context(value) {
+        this._context = value;
+    }
+    get context() {
+        return this._context;
+    }
     subscribe(follower) {
         this._followers[follower.name] = follower;
     }
@@ -123,7 +129,7 @@ class Influencer {
             return;
         }
         for (let i = 0; i < followers.length; i++) {
-            followers[i].onTrendChange(trend, model);
+            followers[i].onTrendChange(this, trend, model);
         }
     }
     serialize() {
@@ -153,7 +159,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NullState = void 0;
 const state_1 = __webpack_require__(/*! ./state */ "./influencer/state.ts");
 class NullState extends state_1.State {
-    handle(follower, trend, model) {
+    handle(influencer, follower, trend, model) {
     }
 }
 exports.NullState = NullState;
@@ -327,11 +333,11 @@ class SinglefinHtmlTemplateEngineHandler {
     constructor(callback) {
         this._callback = callback;
     }
-    onChangeLayout(layout, data) {
+    onChangeLayout(layout, component, data) {
         if (!this._callback) {
             return;
         }
-        this._callback(layout, data);
+        this._callback(layout, component, data);
     }
 }
 exports.SinglefinHtmlTemplateEngineHandler = SinglefinHtmlTemplateEngineHandler;
@@ -360,7 +366,7 @@ class SinglefinSession extends influencer_1.Influencer {
         this._pages = pages;
         this._pagesComponents = pagesComponents;
         this._handlers = handlers;
-        this._currentTrend = js_entity_store_1.EntityFactory.newEntity(this._entityStore, {
+        this.context = js_entity_store_1.EntityFactory.newEntity(this._entityStore, {
             "entity": "Singlefin",
             "ref": false,
             "properties": {
@@ -369,7 +375,9 @@ class SinglefinSession extends influencer_1.Influencer {
                 },
                 "trends": {
                     "value": {}
-                }
+                },
+                "page": "",
+                "layout": ""
             }
         });
         this._entityStore.addSource("Singlefin", new singlefinsource_1.SinglefinSource());
@@ -395,8 +403,8 @@ class SinglefinSession extends influencer_1.Influencer {
     inform(trend) {
         return new Promise((resolve, reject) => {
             const followers = this._trends[trend];
-            this._currentTrend.trend = trend;
-            this._currentTrend.trends[trend] = this.serializeFollowers(followers);
+            this.context.trend = trend;
+            this.context.trends[trend] = this.serializeFollowers(followers);
             this._entityStore.sync(() => {
                 this.newTrend(trend, this._model);
                 this._entityStore.sync(() => {
@@ -408,13 +416,13 @@ class SinglefinSession extends influencer_1.Influencer {
     informTo(bridge, trend) {
         return new Promise((resolve, reject) => {
             const followers = this._trends[trend];
-            this._currentTrend.trend = trend;
+            this.context.trend = trend;
             if (followers) {
-                this._currentTrend.trends[trend] = this.serializeFollowers(followers);
+                this.context.trends[trend] = this.serializeFollowers(followers);
             }
             this._entityStore.syncTo(bridge, () => {
-                this.init(this._currentTrend.trends);
-                this.newTrend(this._currentTrend.trend, this._model);
+                this.init(this.context.trends);
+                this.newTrend(this.context.trend, this._model);
                 this._entityStore.syncTo(bridge, () => {
                     resolve();
                 });
@@ -424,23 +432,38 @@ class SinglefinSession extends influencer_1.Influencer {
     informFrom(bridge, actions) {
         return new Promise((resolve, reject) => {
             this._entityStore.syncFrom(bridge, actions, () => {
-                this.init(this._currentTrend.trends);
-                this.newTrend(this._currentTrend.trend, this._model);
-                const followers = this._trends[this._currentTrend.trend];
+                this.init(this.context.trends);
+                this.newTrend(this.context.trend, this._model);
+                const followers = this._trends[this.context.trend];
                 if (!followers) {
                     return resolve;
                 }
-                this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+                this.context.trends[this.context.trend] = this.serializeFollowers(followers);
             }, () => {
                 resolve();
             });
         });
     }
-    render(windowObject, page, layout, bridge) {
+    render(windowObject, layout, bridge, trend) {
+        let pageLayout = this.context.layout;
+        if (layout) {
+            pageLayout = layout;
+        }
+        if (bridge && trend) {
+            this.informTo(bridge, trend).then(() => {
+                this.renderPage(windowObject, this.context.page, pageLayout, bridge);
+            });
+        }
+        else {
+            this.renderPage(windowObject, this.context.page, pageLayout, bridge);
+        }
+    }
+    renderPage(windowObject, page, layout, bridge) {
         const htmlTemplateEngine = new js_html_template_engine_1.HtmlTemplateEngine(windowObject);
-        htmlTemplateEngine.htmlTemplateEngineHandler = new singlefinhtmltemplateenginehandler_1.SinglefinHtmlTemplateEngineHandler((layout, data) => {
+        htmlTemplateEngine.htmlTemplateEngineHandler = new singlefinhtmltemplateenginehandler_1.SinglefinHtmlTemplateEngineHandler((layout, component, data) => {
             if (bridge && data && data.trend) {
                 this.informTo(bridge, data.trend).then(() => {
+                    component.changeLayout(this.context.layout);
                 }).catch((errorStatus) => {
                     console.log("inform error: " + errorStatus);
                 });

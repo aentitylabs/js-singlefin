@@ -1,5 +1,6 @@
 import { Bridge, EntityFactory, EntityStore, Source } from "js-entity-store";
 import { HtmlTemplateEngine } from "js-html-template-engine";
+import { Component } from "js-template-engine";
 import { Influencer } from "./influencer/influencer";
 import { SinglefinHtmlTemplateEngineHandler } from "./singlefinhtmltemplateenginehandler";
 import { SinglefinSource } from "./singlefinsource";
@@ -10,7 +11,6 @@ export class SinglefinSession extends Influencer {
     private _pagesComponents: any;
     private _handlers: any;
     private _model: any;
-    private _currentTrend: any;
     private _data: any;
 
     public constructor(pages?: any, pagesComponents?: any, handlers?: any) {
@@ -20,7 +20,7 @@ export class SinglefinSession extends Influencer {
         this._pagesComponents = pagesComponents;
         this._handlers = handlers;
 
-        this._currentTrend = EntityFactory.newEntity(this._entityStore, {
+        this.context = EntityFactory.newEntity(this._entityStore, {
             "entity": "Singlefin",
             "ref": false,
             "properties": {
@@ -29,7 +29,9 @@ export class SinglefinSession extends Influencer {
                 },
                 "trends": {
                     "value": {}
-                }
+                },
+                "page": "",
+                "layout": ""
             }
         });
 
@@ -64,8 +66,8 @@ export class SinglefinSession extends Influencer {
         return new Promise((resolve, reject) => {
             const followers = this._trends[trend];
 
-            this._currentTrend.trend = trend;
-            this._currentTrend.trends[trend] = this.serializeFollowers(followers);
+            this.context.trend = trend;
+            this.context.trends[trend] = this.serializeFollowers(followers);
 
             this._entityStore.sync(() => {
                 this.newTrend(trend, this._model);
@@ -81,16 +83,16 @@ export class SinglefinSession extends Influencer {
         return new Promise((resolve, reject) => {
             const followers = this._trends[trend];
 
-            this._currentTrend.trend = trend;
+            this.context.trend = trend;
 
             if(followers) {
-                this._currentTrend.trends[trend] = this.serializeFollowers(followers);   
+                this.context.trends[trend] = this.serializeFollowers(followers);   
             }
     
             this._entityStore.syncTo(bridge, () => {
-                this.init(this._currentTrend.trends);
+                this.init(this.context.trends);
     
-                this.newTrend(this._currentTrend.trend, this._model);
+                this.newTrend(this.context.trend, this._model);
     
                 this._entityStore.syncTo(bridge, () => {
                     resolve();
@@ -102,30 +104,47 @@ export class SinglefinSession extends Influencer {
     public informFrom(bridge: string, actions: any): Promise<void> {
         return new Promise((resolve, reject) => {
             this._entityStore.syncFrom(bridge, actions, () => {
-                this.init(this._currentTrend.trends);
+                this.init(this.context.trends);
 
-                this.newTrend(this._currentTrend.trend, this._model);
+                this.newTrend(this.context.trend, this._model);
 
-                const followers = this._trends[this._currentTrend.trend];
+                const followers = this._trends[this.context.trend];
 
                 if(!followers) {
                     return resolve;
                 }
 
-                this._currentTrend.trends[this._currentTrend.trend] = this.serializeFollowers(followers);
+                this.context.trends[this.context.trend] = this.serializeFollowers(followers);
             }, () => {
                 resolve();
             });
         });
     }
 
-    public render(windowObject: any, page: string, layout?: string, bridge?: string) {
+    public render(windowObject: any, layout?: string, bridge?: string, trend?: string) {
+        let pageLayout: string = this.context.layout;
+
+        if(layout) {
+            pageLayout = layout;
+        }
+
+        if(bridge && trend) {
+            this.informTo(bridge, trend).then(() => {
+                this.renderPage(windowObject, this.context.page, pageLayout, bridge);
+            });
+        }
+        else {
+            this.renderPage(windowObject, this.context.page, pageLayout, bridge);
+        }
+    }
+
+    private renderPage(windowObject: any, page: string, layout?: string, bridge?: string) {
         const htmlTemplateEngine = new HtmlTemplateEngine(windowObject);
-    
-        htmlTemplateEngine.htmlTemplateEngineHandler = new SinglefinHtmlTemplateEngineHandler((layout: string, data: any) => {
+
+        htmlTemplateEngine.htmlTemplateEngineHandler = new SinglefinHtmlTemplateEngineHandler((layout: string, component: Component, data: any) => {
             if(bridge && data && data.trend) {
                 this.informTo(bridge, data.trend).then(() => {
-                
+                    component.changeLayout(this.context.layout);
                 }).catch((errorStatus: any) => {
                     console.log("inform error: " + errorStatus)
                 });

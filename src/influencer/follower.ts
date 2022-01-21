@@ -48,16 +48,16 @@ export class Follower {
         this._state = this._states[state];
     }
 
-    public handle(trend: string, model: any): void {
-        this._state.handle(this, trend, model);
+    public handle(influencer: Influencer, trend: string, model: any): void {
+        this._state.handle(influencer, this, trend, model);
     }
 
-    public onTrendChange(trend: string, model: any): void {
+    public onTrendChange(influencer: Influencer, trend: string, model: any): void {
         if(this._trendStates[trend]) {
             this._state = this._trendStates[trend];
         }
         
-        this.handle(trend, model);
+        this.handle(influencer, trend, model);
     }
 
     public set state(state: State) {

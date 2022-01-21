@@ -6,7 +6,6 @@ export declare class SinglefinSession extends Influencer {
     private _pagesComponents;
     private _handlers;
     private _model;
-    private _currentTrend;
     private _data;
     constructor(pages?: any, pagesComponents?: any, handlers?: any);
     set data(value: any);
@@ -18,6 +17,7 @@ export declare class SinglefinSession extends Influencer {
     inform(trend: string): Promise<void>;
     informTo(bridge: string, trend: string): Promise<void>;
     informFrom(bridge: string, actions: any): Promise<void>;
-    render(windowObject: any, page: string, layout?: string, bridge?: string): void;
+    render(windowObject: any, layout?: string, bridge?: string, trend?: string): void;
+    private renderPage;
     private serializeFollowers;
 }

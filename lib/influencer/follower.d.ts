@@ -14,8 +14,8 @@ export declare class Follower {
     follow(trend: string): void;
     on(trend: string, state: string): void;
     changeState(state: string): void;
-    handle(trend: string, model: any): void;
-    onTrendChange(trend: string, model: any): void;
+    handle(influencer: Influencer, trend: string, model: any): void;
+    onTrendChange(influencer: Influencer, trend: string, model: any): void;
     set state(state: State);
     serialize(): any;
     deserialize(follower: any): void;

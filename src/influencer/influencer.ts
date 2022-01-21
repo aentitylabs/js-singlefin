@@ -3,7 +3,16 @@ import { Follower } from "./follower";
 export class Influencer {
     protected _followers: any = {};
     protected _trends: any = {};
+    protected _context: any;
 
+
+    public set context(value: any) {
+        this._context = value;
+    }
+
+    public get context() {
+        return this._context;
+    }
 
     public subscribe(follower: Follower){
         this._followers[follower.name] = follower;
@@ -39,7 +48,7 @@ export class Influencer {
         }
 
         for(let i=0; i<followers.length; i++) {
-            followers[i].onTrendChange(trend, model);
+            followers[i].onTrendChange(this, trend, model);
         }
     }
 

@@ -1,4 +1,5 @@
 import { Follower } from "./follower";
+import { Influencer } from "./influencer";
 
 export abstract class State {
     private _name: string = "";
@@ -12,5 +13,5 @@ export abstract class State {
         return this._name;
     }
 
-    public abstract handle(follower: Follower, trend: string, model: any): void;
+    public abstract handle(influencer: Influencer, follower: Follower, trend: string, model: any): void;
 }
