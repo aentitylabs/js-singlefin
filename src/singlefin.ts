@@ -16,38 +16,6 @@ export class Singlefin {
 
         session.loadModel(model);
 
-        const app = new Follower(name);
-        
-        app.subscribe(session);
-
-        for(const state in states) {
-            app.addState(states[state].name, new states[state]());
-        }
-        
-        const initialTrends: any = {};
-
-        for(const trend in trends) {
-            app.follow(trend);
-
-            if(trends[trend].hasOwnProperty("defaultstate")) {
-                app.on(trend, trends[trend]["defaultstate"]);
-            }
-
-            if(trends[trend].hasOwnProperty("initialstate")) {
-                initialTrends[trend] = [];
-                initialTrends[trend].push({
-                    name: name,
-                    state: trends[trend]["initialstate"]
-                });
-            }
-
-            if(trends[trend].hasOwnProperty("defaultstate")) {
-                app.on(trend, trends[trend]["defaultstate"]);
-            }
-        }
-
-        session.init(initialTrends);
-
         return session;
     }
 }

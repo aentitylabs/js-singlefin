@@ -8,24 +8,24 @@ export class MockSource extends Source {
 
 
     public load(entity: any, onLoad: any): void {
-        const loadedEntity = this._loadedEntities.shift();
+        /*const loadedEntity = this._loadedEntities.shift();
 
         if(!loadedEntity) {
             return onLoad(entity);
-        }
+        }*/
 
-        onLoad(loadedEntity);
+        onLoad(entity);
     }
 
     public update(entity: any, onUpdate: any): void {
-        this._updatedEntities.push(entity);
+        //this._updatedEntities.push(entity);
 
         //TODO: eliminare l'if e settare sempre nel test...
-        if(!this._updatedEntity) {
+        /*if(!this._updatedEntity) {
             return onUpdate(entity);
-        }
+        }*/
 
-        onUpdate(this._updatedEntity);
+        onUpdate(entity);
     }
 
     public delete(entity: any, onDelete: any): void {

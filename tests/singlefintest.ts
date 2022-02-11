@@ -1,46 +1,282 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
-import { LoginFormState } from '../src/test/loginformstate';
-import { HomeState } from '../src/test/homestate';
-import { ClientLoginFormState } from '../src/test/clientloginformstate';
-import { ClientHomeState } from '../src/test/clienthomestate';
-import { AlertClosedState } from '../src/test/alertclosedstate';
-import { AlertWaitState } from '../src/test/alertwaitstate';
 import { MockSource } from '../src/test/mocksource';
-import { MockBridge } from '../src/test/mockbridge';
-import { Follower } from '../src/influencer/follower';
 import { SinglefinSession } from '../src/singlefinsession';
+import { State } from '../src/scenario/state';
+import { MockBridge } from '../src/test/mockbridge';
 
 
 describe('Broker', () => {
-    it('test singlefin', () => {        
+    it('test scenario', () => {
         const session: SinglefinSession = new SinglefinSession();
 
         const source: MockSource = new MockSource();
 
-        session.addSource("User", source);
+        session.addSource("Mock", source);
 
         session.loadModel({
             "entity": "App",
             "ref": false,
             "properties": {
-                "user": {
-                    "entity": "User",
+                "data": {
+                    "entity": "Data",
                     "ref": false,
                     "properties": {
-                        "id": {
+                        "val1": {
                             "value": ""
                         },
-                        "name": {
+                        "val2": {
+                            "value": ""
+                        }
+                    }
+                }
+            }
+        });
+
+        session.addContextStatesInstances("context1", {
+            "context1state1": class Context1State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hello";
+                    model.data.val2 = "Tom";
+
+                    next();
+                }
+            }
+        });
+        session.addContextStatesInstances("context2", {
+            "context2state1": class Context2State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hi";
+                    model.data.val2 = "Alice";
+
+                    next();
+                }
+            }
+        });
+
+        session.addScenario({
+            name: "scenario1",
+            contexts: [{
+                name: "context1",
+                state: "context1state1"
+            }]
+        });
+
+        session.addScenario({
+            name: "scenario2",
+            contexts: [{
+                name: "context2",
+                state: "context2state1"
+            }]
+        });
+
+        session.sync("scenario1");
+
+        expect(session.model.data.val1).to.eql("hello");
+        expect(session.model.data.val2).to.eql("Tom");
+
+        session.sync("scenario2");
+
+        expect(session.model.data.val1).to.eql("hi");
+        expect(session.model.data.val2).to.eql("Alice");
+    })
+
+    it('test scenario change context state', () => {
+        const session: SinglefinSession = new SinglefinSession();
+
+        const source: MockSource = new MockSource();
+
+        session.addSource("Mock", source);
+
+        session.loadModel({
+            "entity": "App",
+            "ref": false,
+            "properties": {
+                "data": {
+                    "entity": "Data",
+                    "ref": false,
+                    "properties": {
+                        "val1": {
                             "value": ""
                         },
-                        "role": {
+                        "val2": {
+                            "value": ""
+                        }
+                    }
+                }
+            }
+        });
+
+        session.addContextStatesInstances("context1", {
+            "context1state1": class Context1State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hello";
+                    model.data.val2 = "Tom";
+
+                    next("context1state2");
+                }
+            },
+            "context1state2": class Context1State2 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "bye";
+                    model.data.val2 = "Robert";
+
+                    next();
+                }
+            }
+        });
+        session.addContextStatesInstances("context2", {
+            "context2state1": class Context2State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hi";
+                    model.data.val2 = "Alice";
+
+                    next();
+                }
+            }
+        });
+
+        session.addScenario({
+            name: "scenario1",
+            contexts: [{
+                name: "context1",
+                state: "context1state1"
+            }]
+        });
+
+        session.addScenario({
+            name: "scenario2",
+            contexts: [{
+                name: "context2",
+                state: "context2state1"
+            }]
+        });
+
+        session.sync("scenario1");
+
+        expect(session.model.data.val1).to.eql("hello");
+        expect(session.model.data.val2).to.eql("Tom");
+
+        session.sync("scenario2");
+
+        expect(session.model.data.val1).to.eql("hi");
+        expect(session.model.data.val2).to.eql("Alice");
+
+        session.sync("scenario1");
+
+        expect(session.model.data.val1).to.eql("bye");
+        expect(session.model.data.val2).to.eql("Robert");
+    })
+
+    it('test scenario with more contexts and change context state', () => {
+        const session: SinglefinSession = new SinglefinSession();
+
+        const source: MockSource = new MockSource();
+
+        session.addSource("Mock", source);
+
+        session.loadModel({
+            "entity": "App",
+            "ref": false,
+            "properties": {
+                "data": {
+                    "entity": "Data",
+                    "ref": false,
+                    "properties": {
+                        "val1": {
                             "value": ""
                         },
-                        "username": {
+                        "val2": {
+                            "value": ""
+                        }
+                    }
+                }
+            }
+        });
+
+        session.addContextStatesInstances("context1", {
+            "context1state1": class Context1State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hello";
+                    model.data.val2 = "Tom";
+
+                    next();
+                }
+            }
+        });
+        session.addContextStatesInstances("context2", {
+            "context2state1": class Context2State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hi";
+                    model.data.val2 = "Alice";
+
+                    next("context2state2");
+                }
+            },
+            "context2state2": class Context2State2 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "bye";
+                    model.data.val2 = "Robert";
+
+                    next();
+                }
+            }
+        });
+
+        session.addScenario({
+            name: "scenario1",
+            contexts: [{
+                name: "context1",
+                state: "context1state1"
+            },{
+                name: "context2",
+                state: "context2state2"
+            }]
+        });
+
+        session.addScenario({
+            name: "scenario2",
+            contexts: [{
+                name: "context2",
+                state: "context2state1"
+            }]
+        });
+
+        session.sync("scenario1");
+
+        expect(session.model.data.val1).to.eql("bye");
+        expect(session.model.data.val2).to.eql("Robert");
+
+        session.sync("scenario2");
+
+        expect(session.model.data.val1).to.eql("hi");
+        expect(session.model.data.val2).to.eql("Alice");
+
+        session.sync("scenario1");
+
+        expect(session.model.data.val1).to.eql("bye");
+        expect(session.model.data.val2).to.eql("Robert");
+    })
+
+    it('test scenario error', () => {
+        const session: SinglefinSession = new SinglefinSession();
+
+        const source: MockSource = new MockSource();
+
+        session.addSource("Mock", source);
+
+        session.loadModel({
+            "entity": "App",
+            "ref": false,
+            "properties": {
+                "data": {
+                    "entity": "Data",
+                    "ref": false,
+                    "properties": {
+                        "val1": {
                             "value": ""
                         },
-                        "password": {
+                        "val2": {
                             "value": ""
                         }
                     }
@@ -49,129 +285,90 @@ describe('Broker', () => {
         });
 
         source.loadedEntities = [{
-            "id": "",
-            "name": "",
-            "role": "",
-            "username": "",
-            "password": ""
+            "val1": "",
+            "val2": ""
         }];
 
-        const app = new Follower("App");
-        
-        app.subscribe(session);
+        session.addContextStatesInstances("context1", {
+            "context1state1": class Context1State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hello";
+                    model.data.val2 = "Tom";
 
-        app.addState("is showing login form", new LoginFormState());
-        app.addState("is showing homepage", new HomeState());
+                    error();
+                }
+            },
+            "context1state2": class Context1State2 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "bye";
+                    model.data.val2 = "Robert";
 
-        app.follow("open app");
-        app.follow("access to homepage");
+                    next();
+                }
+            }
+        });
+        session.addContextStatesInstances("context2", {
+            "context2state1": class Context2State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hi";
+                    model.data.val2 = "Alice";
 
-        const appAlert = new Follower("AppAlert");
-        
-        appAlert.subscribe(session);
+                    next();
+                }
+            }
+        });
 
-        appAlert.addState("is closed", new AlertClosedState());
-        appAlert.addState("is showing wait alert", new AlertWaitState());
-
-        appAlert.follow("login");
-        appAlert.follow("access to homepage");
-
-        session.init({
-            "open app": [{
-                "name": "App",
-                "state": "is showing homepage"
-            }],
-            "login": [{
-                "name": "AppAlert",
-                "state": "is closed"
+        session.addScenario({
+            name: "scenario1",
+            contexts: [{
+                name: "context1",
+                state: "context1state1"
             }]
         });
 
-        session.inform("open app");
+        session.addScenario({
+            name: "scenario2",
+            contexts: [{
+                name: "context2",
+                state: "context2state1"
+            }]
+        });
 
-        expect({
-            "followers": {
-                "App": {
-                    "name": "App",
-                    "state": "is showing login form"
-                },
-                "AppAlert": {
-                    "name": "AppAlert",
-                    "state": "is closed"
-                }
-            }
-        }).to.eql(session.serialize());
+        session.sync("scenario1");
 
-        session.model.user.username = "tom";
-        session.model.user.password = "password";
+        expect(session.model.data.val1).to.eql("hello");
+        expect(session.model.data.val2).to.eql("Tom");
 
-        source.updatedEntity = {
-            "id": 1,
-            "name": "Tom",
-            "role": "administrator",
-            "username": "tom",
-            "password": ""
-        };
+        session.sync("scenario2");
 
-        session.inform("login");
+        expect(session.model.data.val1).to.eql("hi");
+        expect(session.model.data.val2).to.eql("Alice");
 
-        expect({
-            "followers": {
-                "App": {
-                    "name": "App",
-                    "state": "is showing login form"
-                },
-                "AppAlert": {
-                    "name": "AppAlert",
-                    "state": "is showing wait alert"
-                }
-            }
-        }).to.eql(session.serialize());
+        session.sync("scenario1");
 
-        session.inform("access to homepage");
-
-        expect({
-            "followers": {
-                "App": {
-                    "name": "App",
-                    "state": "is showing homepage"
-                },
-                "AppAlert": {
-                    "name": "AppAlert",
-                    "state": "is closed"
-                }
-            }
-        }).to.eql(session.serialize());
+        expect(session.model.data.val1).to.eql("hello");
+        expect(session.model.data.val2).to.eql("Tom");
     })
 
-    it('test singlefin with trend listener', () => {
+    it('test scenario error and change contex state', () => {
         const session: SinglefinSession = new SinglefinSession();
 
         const source: MockSource = new MockSource();
 
-        session.addSource("User", source);
+        session.addSource("Mock", source);
 
         session.loadModel({
             "entity": "App",
             "ref": false,
             "properties": {
-                "user": {
-                    "entity": "User",
+                "data": {
+                    "entity": "Data",
                     "ref": false,
                     "properties": {
-                        "id": {
+                        "val1": {
                             "value": ""
                         },
-                        "name": {
-                            "value": ""
-                        },
-                        "role": {
-                            "value": ""
-                        },
-                        "username": {
-                            "value": ""
-                        },
-                        "password": {
+                        "val2": {
                             "value": ""
                         }
                     }
@@ -179,106 +376,76 @@ describe('Broker', () => {
             }
         });
 
-        source.loadedEntities = [{
-            "id": "",
-            "name": "",
-            "role": "",
-            "username": "",
-            "password": ""
-        }];
-        
-        const app = new Follower("App");
+        session.addContextStatesInstances("context1", {
+            "context1state1": class Context1State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hello";
+                    model.data.val2 = "Tom";
 
-        app.subscribe(session);
+                    error("context1state3");
+                }
+            },
+            "context1state2": class Context1State2 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "bye";
+                    model.data.val2 = "Robert";
 
-        app.addState("is showing login form", new LoginFormState());
-        app.addState("is showing homepage", new HomeState());
+                    next();
+                }
+            },
+            "context1state3": class Context1State3 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "error";
+                    model.data.val2 = "error!";
 
-        app.follow("open app");
-        app.follow("access to homepage");
+                    next();
+                }
+            }
+        });
+        session.addContextStatesInstances("context2", {
+            "context2state1": class Context2State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hi";
+                    model.data.val2 = "Alice";
 
-        const appAlert = new Follower("AppAlert");
+                    next();
+                }
+            }
+        });
 
-        appAlert.subscribe(session);
-
-        appAlert.addState("is closed", new AlertClosedState());
-        appAlert.addState("is showing wait alert", new AlertWaitState());
-
-        appAlert.on("login", "is showing wait alert");
-        appAlert.on("access to homepage", "is closed");
-
-        appAlert.follow("login");
-        appAlert.follow("access to homepage");
-
-        session.init({
-            "open app": [{
-                "name": "App",
-                "state": "is showing homepage"
-            }],
-            "login": [{
-                "name": "AppAlert",
-                "state": "is closed"
+        session.addScenario({
+            name: "scenario1",
+            contexts: [{
+                name: "context1",
+                state: "context1state1"
             }]
         });
 
-        session.inform("open app");
+        session.addScenario({
+            name: "scenario2",
+            contexts: [{
+                name: "context2",
+                state: "context2state1"
+            }]
+        });
 
-        expect({
-            "followers": {
-                "App": {
-                    "name": "App",
-                    "state": "is showing login form"
-                },
-                "AppAlert": {
-                    "name": "AppAlert",
-                    "state": "is closed"
-                }
-            }
-        }).to.eql(session.serialize());
+        session.sync("scenario1");
 
-        session.model.user.username = "tom";
-        session.model.user.password = "password";
+        expect(session.model.data.val1).to.eql("hello");
+        expect(session.model.data.val2).to.eql("Tom");
 
-        source.updatedEntity = {
-            "id": 1,
-            "name": "Tom",
-            "role": "administrator",
-            "username": "tom",
-            "password": ""
-        };
+        session.sync("scenario2");
 
-        session.inform("login");
+        expect(session.model.data.val1).to.eql("hi");
+        expect(session.model.data.val2).to.eql("Alice");
 
-        expect({
-            "followers": {
-                "App": {
-                    "name": "App",
-                    "state": "is showing login form"
-                },
-                "AppAlert": {
-                    "name": "AppAlert",
-                    "state": "is showing wait alert"
-                }
-            }
-        }).to.eql(session.serialize());
+        session.sync("scenario1");
 
-        session.inform("access to homepage");
-
-        expect({
-            "followers": {
-                "App": {
-                    "name": "App",
-                    "state": "is showing homepage"
-                },
-                "AppAlert": {
-                    "name": "AppAlert",
-                    "state": "is closed"
-                }
-            }
-        }).to.eql(session.serialize());
+        expect(session.model.data.val1).to.eql("error");
+        expect(session.model.data.val2).to.eql("error!");
     })
 
-    it('test singlefin with bridge', () => {
+    it('test scenario and remote sync', () => {
         const bridge = new MockBridge();
 
         const serverSession: SinglefinSession = new SinglefinSession();
@@ -287,32 +454,24 @@ describe('Broker', () => {
 
         const source: MockSource = new MockSource();
 
-        serverSession.addSource("User", source);
-        clientSession.addSource("User", source);
+        serverSession.addSource("Data", source);
+        clientSession.addSource("Data", source);
 
+        serverSession.addBridge("MockBridge", bridge);
         clientSession.addBridge("MockBridge", bridge);
 
         serverSession.loadModel({
             "entity": "App",
             "ref": false,
             "properties": {
-                "user": {
-                    "entity": "User",
+                "data": {
+                    "entity": "Data",
                     "ref": false,
                     "properties": {
-                        "id": {
+                        "val1": {
                             "value": ""
                         },
-                        "name": {
-                            "value": ""
-                        },
-                        "role": {
-                            "value": ""
-                        },
-                        "username": {
-                            "value": ""
-                        },
-                        "password": {
+                        "val2": {
                             "value": ""
                         }
                     }
@@ -323,23 +482,14 @@ describe('Broker', () => {
             "entity": "App",
             "ref": false,
             "properties": {
-                "user": {
-                    "entity": "User",
+                "data": {
+                    "entity": "Data",
                     "ref": false,
                     "properties": {
-                        "id": {
+                        "val1": {
                             "value": ""
                         },
-                        "name": {
-                            "value": ""
-                        },
-                        "role": {
-                            "value": ""
-                        },
-                        "username": {
-                            "value": ""
-                        },
-                        "password": {
+                        "val2": {
                             "value": ""
                         }
                     }
@@ -347,164 +497,102 @@ describe('Broker', () => {
             }
         });
 
-        source.loadedEntities = [{
-            "id": "",
-            "name": "",
-            "role": "",
-            "username": "",
-            "password": ""
-        },{
-            "id": "",
-            "name": "",
-            "role": "",
-            "username": "",
-            "password": ""
-        },{
-            "id": "",
-            "name": "",
-            "role": "",
-            "username": "",
-            "password": ""
-        }];
+        serverSession.addContextStatesInstances("context1", {
+            "context1state1": class Context1State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hi!";
+                    model.data.val2 = "I'm a server";
 
-        const app = new Follower("App");
+                    next();
+                }
+            },
+            "context1state2": class Context1State2 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hello!";
+                    model.data.val2 = "How are you?";
 
-        app.subscribe(serverSession);
+                    next();
+                }
+            }
+        });
 
-        app.addState("is showing login form", new LoginFormState());
-        app.addState("is showing homepage", new HomeState());
+        clientSession.addContextStatesInstances("context1", {
+            "context1state1": class Context1State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    next("context1state2");
+                }
+            },
+            "context1state2": class Context1State2 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "bye";
+                    model.data.val2 = "Robert";
 
-        app.follow("open app");
-        app.follow("login");
-        app.follow("access to homepage");
+                    next();
+                }
+            }
+        });
+        clientSession.addContextStatesInstances("context2", {
+            "context2state1": class Context2State1 implements State {
+                resolve(model: any, next: any, error: any): void {
+                    model.data.val1 = "hi";
+                    model.data.val2 = "Alice";
 
-        const appClient = new Follower("App");
+                    next();
+                }
+            }
+        });
 
-        appClient.subscribe(clientSession);
-
-        appClient.addState("is showing login form", new ClientLoginFormState());
-        appClient.addState("is showing homepage", new ClientHomeState());
-
-        appClient.follow("open app");
-        appClient.follow("login");
-        appClient.follow("access to homepage");
-
-        const appAlert = new Follower("AppAlert");
-
-        appAlert.subscribe(clientSession);
-
-        appAlert.addState("is closed", new AlertClosedState());
-        appAlert.addState("is showing wait alert", new AlertWaitState());
-
-        appAlert.on("login", "is showing wait alert");
-        appAlert.on("access to homepage", "is closed");
-
-        appAlert.follow("login");
-        appAlert.follow("access to homepage");
-
-        serverSession.init({
-            "open app": [{
-                "name": "App",
-                "state": "is showing homepage"
+        serverSession.addScenario({
+            name: "scenario1",
+            contexts: [{
+                name: "context1",
+                state: "context1state1"
+            }]
+        });
+        serverSession.addScenario({
+            name: "scenario2",
+            contexts: [{
+                name: "context2",
+                state: "context2state1"
             }]
         });
 
-        clientSession.init({
-            "open app": [{
-                "name": "App",
-                "state": "is showing homepage"
-            }],
-            "login": [{
-                "name": "AppAlert",
-                "state": "is closed"
+        clientSession.addScenario({
+            name: "scenario1",
+            contexts: [{
+                name: "context1",
+                state: "context1state1"
+            }]
+        });
+        clientSession.addScenario({
+            name: "scenario2",
+            contexts: [{
+                name: "context1",
+                state: "context1state1"
+            },{
+                name: "context2",
+                state: "context2state1"
             }]
         });
 
         bridge.onReceived((actions: any) => {
-            serverSession.informFrom("MockBridge", actions);
+            serverSession.syncFrom("MockBridge", actions);
         });
 
-        clientSession.informTo("MockBridge", "open app").then(() => {
-            expect({
-                "followers": {
-                    "App": {
-                        "name": "App",
-                        "state": "is showing login form"
-                    }
-                }
-            }).to.eql(serverSession.serialize());
-    
-            expect({
-                "followers": {
-                    "App": {
-                        "name": "App",
-                        "state": "is showing login form"
-                    },
-                    "AppAlert": {
-                        "name": "AppAlert",
-                        "state": "is closed"
-                    }
-                }
-            }).to.eql(clientSession.serialize());
-    
-            clientSession.model.user.username = "tom";
-            clientSession.model.user.password = "password";
-    
-            source.updatedEntity = {
-                "id": 1,
-                "name": "Tom",
-                "role": "administrator",
-                "username": "tom",
-                "password": ""
-            };
-    
-            clientSession.informTo("MockBridge", "login").then(() => {
-                expect({
-                    "followers": {
-                        "App": {
-                            "name": "App",
-                            "state": "is showing homepage"
-                        }
-                    }
-                }).to.eql(serverSession.serialize());
-        
-                expect({
-                    "followers": {
-                        "App": {
-                            "name": "App",
-                            "state": "is showing homepage"
-                        },
-                        "AppAlert": {
-                            "name": "AppAlert",
-                            "state": "is showing wait alert"
-                        }
-                    }
-                }).to.eql(clientSession.serialize());
-        
-                clientSession.informTo("MockBridge", "access to homepage").then(() => {
-                    expect({
-                        "followers": {
-                            "App": {
-                                "name": "App",
-                                "state": "is showing homepage"
-                            }
-                        }
-                    }).to.eql(serverSession.serialize());
-            
-                    expect({
-                        "followers": {
-                            "App": {
-                                "name": "App",
-                                "state": "is showing homepage"
-                            },
-                            "AppAlert": {
-                                "name": "AppAlert",
-                                "state": "is closed"
-                            }
-                        }
-                    }).to.eql(clientSession.serialize());
-                });
-            }); 
-        });
+        clientSession.syncTo("MockBridge", "scenario1");
+
+        expect(clientSession.model.data.val1).to.eql("bye");
+        expect(clientSession.model.data.val2).to.eql("Robert");
+
+        expect(serverSession.model.data.val1).to.eql("hello!");
+        expect(serverSession.model.data.val2).to.eql("How are you?");
+
+        clientSession.sync("scenario2");
+
+        expect(clientSession.model.data.val1).to.eql("hi");
+        expect(clientSession.model.data.val2).to.eql("Alice");
+
+        expect(serverSession.model.data.val1).to.eql("hello!");
+        expect(serverSession.model.data.val2).to.eql("How are you?");
     })
 })
